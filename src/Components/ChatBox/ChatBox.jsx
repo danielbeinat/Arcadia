@@ -19,7 +19,7 @@ export const ChatBox = () => {
       </button>
 
       {Show && (
-        <div className="fixed md:bottom-24 md:right-8 bottom-0 right-0 z-50 w-96 bg-white shadow-2xl md:rounded-xl md:h-auto h-screen w-screen mx-auto md:h-auto md:w-96 ">
+        <div className="fixed md:bottom-24 md:right-8 bottom-0 right-0 z-50 w-96 bg-white shadow-2xl md:rounded-xl md:h-screen h-[500px] w-screen mx-auto md:w-96 ">
           <div className="flex items-center justify-between md:rounded-t-xl p-4 bg-blue-700">
             <h1 className="text-sm text-white font-bold">
               Informes e Inscripción - Instituto Arcadia
