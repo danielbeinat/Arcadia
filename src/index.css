@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: "Exo 2", sans-serif;
+  font-family: "Honk", system-ui;
+  font-family: "Kanit", sans-serif;
+}
+
+.breadcrumb {
+  display: inline-block;
+  overflow: hidden;
+  counter-reset: flag;
+}
+
+.breadcrumb a {
+  text-decoration: none;
+  outline: none;
+  display: block;
+  float: left;
+  font-size: 12px;
+  line-height: 36px;
+  color: rgb(135, 130, 130);
+  padding: 0 10px 0 60px;
+  font-weight: bold;
+  position: relative;
+}
+.breadcrumb a:first-child {
+  padding-left: 46px;
+  border-radius: 5px 0 0 5px;
+}
+.breadcrumb a:first-child:before {
+  left: 14px;
+}
+.breadcrumb a:last-child {
+  border-radius: 0 5px 5px 0;
+  padding-right: 20px;
+}
+
+.breadcrumb a.active,
+.breadcrumb a:hover {
+  background: #1e05ab;
+  background: #4f46e5;
+  color: aliceblue;
+}
+.breadcrumb a.active:after,
+.breadcrumb a:hover:after {
+  background: #4f46e5;
+}
+
+.breadcrumb a:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: -18px;
+  width: 36px;
+  height: 36px;
+  transform: scale(0.707) rotate(45deg);
+  z-index: 1;
+  box-shadow: 2px -2px 0 2px rgba(0, 0, 0, 0.4),
+    3px -3px 0 2px rgba(255, 255, 255, 0.1);
+
+  border-radius: 0 5px 0 50px;
+}
+.breadcrumb a:last-child:after {
+  content: none;
+}
+
+.flat a,
+.flat a:after {
+  background: rgb(245, 243, 243);
+  transition: all 0.7s;
+}
+
+@media only screen and (max-width: 767px) {
+  .breadcrumb {
+    font-size: 10px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 5px;
+  }
+}
