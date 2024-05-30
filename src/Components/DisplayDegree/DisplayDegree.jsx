@@ -14,11 +14,11 @@ export const DisplayDegree = () => {
       <div className="flex flex-col gap-12 mb-20">
         <div className="w-full relative">
           <img
-            className="w-full h-[300px] object-cover brightness-[80%]"
+            className="md:w-full md:h-[300px] object-cover brightness-[80%]"
             src={career.image}
             alt={career.name}
           />
-          <h1 className="absolute bottom-5 left-5 text-[50px] text-white font-bold">
+          <h1 className="absolute md:bottom-5 md:left-5 bottom-2 left-3  md:text-[50px] text-3xl text-white font-bold">
             {career.name}
           </h1>
         </div>
@@ -37,7 +37,7 @@ export const DisplayDegree = () => {
             </p>
           </div>
           <div className="flex w-full">
-            <div className="flex flex-col gap-5 bg-slate-100 p-10 w-full">
+            <div className="flex flex-col gap-5 bg-slate-100 md:p-10 p-5 md:w-full">
               {(career.Type === "presencial" || career.Type === "virtual") && (
                 <div>
                   <h1 className="font-bold text-lg">Titulo:</h1>
@@ -62,7 +62,7 @@ export const DisplayDegree = () => {
                 <p>{career.Time}</p>
               </div>
             </div>
-            <div className="w-full">
+            <div className="w-full hidden md:block">
               <img className="w-[500px] h-auto" src={career.image} alt="" />
             </div>
           </div>

@@ -9,7 +9,7 @@ export const AllDegrees = [
     title: "Licenciatura",
     degree: "Carrera con alcance nacional",
     category: "Humanidades",
-    Time: "08:30 a 12:30 / 14:00 a 18:00 / 18:00 a 22:00",
+    Time: "08:00 a 12:30 / 14:00 a 18:00 / 18:00 a 20:30",
   },
   {
     id: 2,
@@ -21,7 +21,7 @@ export const AllDegrees = [
     title: "Arquitecto",
     degree: "Carrera con alcance nacional",
     category: "arquitectura",
-    Time: "08:30 a 12:30 / 14:00 a 18:00 / 18:00 a 22:00",
+    Time: "08:00 a 12:30 / 14:00 a 18:00 / 18:00 a 20:30",
   },
   {
     id: 3,
@@ -33,7 +33,7 @@ export const AllDegrees = [
     title: "Abogado",
     degree: "Carrera con alcance nacional",
     category: "derecho",
-    Time: "08:30 a 12:30 / 14:00 a 18:00 / 18:00 a 22:00",
+    Time: "08:00 a 12:30 / 14:00 a 18:00 / 18:00 a 20:30",
 
   },
   {
@@ -46,7 +46,7 @@ export const AllDegrees = [
     title: "Contador Público",
     degree: "Carrera con alcance nacional",
     category: "economicas",
-    Time: "08:30 a 12:30 / 14:00 a 18:00 / 18:00 a 22:00",
+    Time: "08:00 a 12:30 / 14:00 a 18:00 / 18:00 a 20:30",
 
   },
   {
@@ -59,7 +59,7 @@ export const AllDegrees = [
     title: "Administrador",
     degree: "Carrera con alcance nacional",
     category: "economicas",
-    Time: "08:30 a 12:30 / 14:00 a 18:00 / 18:00 a 22:00",
+    Time: "08:30 a 12:30 / 14:00 a 18:00 / 18:00 a 20:30",
 
   },
   {
@@ -72,7 +72,7 @@ export const AllDegrees = [
     title: "Ingeniero Civil",
     degree: "Carrera con alcance nacional",
     category: "ingenieria",
-    Time: "08:30 a 12:30 / 14:00 a 18:00 / 18:00 a 22:00",
+    Time: "08:00 a 12:30 / 14:00 a 18:00 / 18:00 a 20:30",
 
   },
   {
@@ -85,7 +85,7 @@ export const AllDegrees = [
     title: "Médico",
     degree: "Carrera con alcance nacional",
     category: "salud",
-    Time: "08:30 a 12:30 / 14:00 a 18:00 / 18:00 a 22:00",
+    Time: "08:00 a 12:30 / 14:00 a 18:00 / 18:00 a 20:30",
 
   },
   {
@@ -98,7 +98,7 @@ export const AllDegrees = [
     title: "Psicólogo",
     degree: "Carrera con alcance nacional",
     category: "psicologia",
-    Time: "08:30 a 12:30 / 14:00 a 18:00 / 18:00 a 22:00",
+    Time: "08:00 a 12:30 / 14:00 a 18:00 / 18:00 a 20:30",
 
   },
   {
@@ -111,7 +111,7 @@ export const AllDegrees = [
     title: "Desarrollador de Software",
     degree: "Carrera con alcance nacional",
     category: "informatica",
-    Time: "08:30 a 12:30 / 14:00 a 18:00 / 18:00 a 22:00",
+    Time: "08:00 a 12:30 / 14:00 a 18:00 / 18:00 a 20:30",
 
   },
   {
@@ -124,7 +124,7 @@ export const AllDegrees = [
     title: "Licenciado en Educación",
     degree: "Carrera con alcance nacional",
     category: "humanidades",
-    Time: "08:30 a 12:30 / 14:00 a 18:00 / 18:00 a 22:00",
+    Time: "08:00 a 12:30 / 14:00 a 18:00 / 18:00 a 20:30",
 
   },
   {
@@ -137,7 +137,7 @@ export const AllDegrees = [
     title: "Licenciado",
     degree: "Carrera con alcance nacional",
     category: "informatica",
-    Time: "08:30 a 12:30 / 14:00 a 18:00 / 18:00 a 22:00",
+    Time: "08:00 a 12:30 / 14:00 a 18:00 / 18:00 a 20:30",
 
   },
   {
@@ -150,7 +150,7 @@ export const AllDegrees = [
     title: "Licenciado",
     degree: "Carrera con alcance nacional",
     category: "informatica",
-    Time: "08:30 a 12:30 / 14:00 a 18:00 / 18:00 a 22:00",
+    Time: "08:00 a 12:30 / 14:00 a 18:00 / 18:00 a 20:30",
 
   },
   {
@@ -163,7 +163,7 @@ export const AllDegrees = [
     title: "Analista de Sistemas",
     degree: "Carrera con alcance nacional",
     category: "informatica",
-    Time: "08:30 a 12:30 / 14:00 a 18:00 / 18:00 a 22:00",
+    Time: "08:00 a 12:30 / 14:00 a 18:00 / 18:00 a 20:30",
 
   },
   {
@@ -176,7 +176,7 @@ export const AllDegrees = [
     title: "Licenciado",
     degree: "Carrera con alcance nacional",
     category: "humanidades",
-    Time: "08:30 a 12:30 / 14:00 a 18:00 / 18:00 a 22:00",
+    Time: "08:00 a 12:30 / 14:00 a 18:00 / 18:00 a 20:30",
 
   },
   {
@@ -189,7 +189,7 @@ export const AllDegrees = [
     title: "Licenciado",
     degree: "Carrera con alcance nacional",
     category: "economiacas",
-    Time: "08:30 a 12:30 / 14:00 a 18:00 / 18:00 a 22:00",
+    Time: "08:00 a 12:30 / 14:00 a 18:00 / 18:00 a 20:30",
 
   },
   {
@@ -202,7 +202,7 @@ export const AllDegrees = [
     title: "Licenciado",
     degree: "Carrera con alcance nacional",
     category: "humanidades",
-    Time: "08:30 a 12:30 / 14:00 a 18:00 / 18:00 a 22:00",
+    Time: "08:00 a 12:30 / 14:00 a 18:00 / 18:00 a 20:30",
 
   },
 
@@ -215,7 +215,7 @@ export const AllDegrees = [
     duration: "8 meses",
     program: "Curso",
     category: "informatica",
-    Time: "08:30 a 12:30 / 14:00 a 18:00 / 18:00 a 22:00",
+    Time: "lunes, miércoles y viernes de 18:00 a 20: 30.",
 
 
   },
@@ -229,7 +229,7 @@ export const AllDegrees = [
     duration: "10 meses",
     program: "Curso",
     category: "bellas artes",
-    Time: "08:30 a 12:30 / 14:00 a 18:00 / 18:00 a 22:00",
+    Time: " lunes, miércoles y viernes de 18:00 a 20:30.",
 
 
   },
@@ -243,7 +243,7 @@ export const AllDegrees = [
     duration: "1 año",
     program: "Curso",
     category: "derecho",
-    Time: "08:30 a 12:30 / 14:00 a 18:00 / 18:00 a 22:00",
+    Time: " lunes, miércoles y viernes de 18:00 a 20:30.",
 
   },
 
@@ -255,7 +255,7 @@ export const AllDegrees = [
     duration: "5 meses",
     program: "Curso",
     category: "informatica",
-    Time: "08:30 a 12:30 / 14:00 a 18:00 / 18:00 a 22:00",
+    Time: " lunes, miércoles y viernes de 18:00 a 20:30.",
 
   },
 
@@ -267,7 +267,7 @@ export const AllDegrees = [
     duration: "3 meses",
     program: "Curso",
     category: "informatica",
-    Time: "08:30 a 12:30 / 14:00 a 18:00 / 18:00 a 22:00",
+    Time: " lunes, miércoles y viernes de 18:00 a 20:30.",
 
   },
 
@@ -280,7 +280,7 @@ export const AllDegrees = [
     program: "Curso",
 
     category: "economias",
-    Time: "08:30 a 12:30 / 14:00 a 18:00 / 18:00 a 22:00",
+    Time: " lunes, miércoles y viernes de 18:00 a 20:30.",
 
   },
 
@@ -293,7 +293,7 @@ export const AllDegrees = [
     program: "Curso",
 
     category: "informatica",
-    Time: "08:30 a 12:30 / 14:00 a 18:00 / 18:00 a 22:00",
+    Time: " lunes, miércoles y viernes de 18:00 a 20:30.",
 
   },
 
@@ -306,7 +306,7 @@ export const AllDegrees = [
     program: "Curso",
 
     category: "informatica",
-    Time: "08:30 a 12:30 / 14:00 a 18:00 / 18:00 a 22:00",
+    Time: " lunes, miércoles y viernes de 18:00 a 20:30.",
 
   },
 
