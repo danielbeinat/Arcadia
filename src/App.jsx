@@ -16,6 +16,7 @@ import { Login } from "./pages/Count/Login";
 import { Inscription } from "../src/pages/Inscription/Inscription";
 import { Category } from "../src/Components/Category/Category";
 import { Register } from "../src/pages/Count/Register";
+import { DisplayDegree } from "../src/Components/DisplayDegree/DisplayDegree";
 
 export const App = () => {
   return (
@@ -37,6 +38,7 @@ export const App = () => {
         <Route path="/inscripciones" element={<Inscription />} />
         <Route path="/area/:category" element={<Category />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/career/:careerId" element={<DisplayDegree />} />
       </Routes>
 
       <Footer />

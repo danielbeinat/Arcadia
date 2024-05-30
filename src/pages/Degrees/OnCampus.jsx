@@ -4,8 +4,15 @@ import { MdCalendarMonth } from "react-icons/md";
 import { FaUserGraduate } from "react-icons/fa6";
 import { GiGraduateCap } from "react-icons/gi";
 import { FaFlag } from "react-icons/fa6";
+import { useNavigate } from "react-router-dom";
 
 export const OnCampus = () => {
+  const navigate = useNavigate();
+  const handleCardClick = (id) => {
+    window.scrollTo(0, 0);
+    navigate(`/career/${id}`);
+  };
+
   const Degree = AllDegrees.filter((item) => item.Type === "presencial");
   return (
     <>
@@ -24,6 +31,7 @@ export const OnCampus = () => {
               className="flex flex-col gap-3 md:w-[340px] w-[290px] mb-10 shadow-lg rounded pb-5 transform transition duration-500 hover:scale-105 cursor-pointer"
               key={item.id}
               alt={item.name}
+              onClick={() => handleCardClick(item.id)}
             >
               <img
                 src={item.image}
