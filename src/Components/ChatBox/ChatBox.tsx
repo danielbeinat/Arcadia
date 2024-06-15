@@ -2,8 +2,8 @@ import { useState } from "react";
 import { BsChatFill } from "react-icons/bs";
 import { IoMdClose } from "react-icons/io";
 
-export const ChatBox = () => {
-  const [Show, setShow] = useState(false);
+export const ChatBox: React.FC = () => {
+  const [Show, setShow] = useState<boolean>(false);
 
   return (
     <>

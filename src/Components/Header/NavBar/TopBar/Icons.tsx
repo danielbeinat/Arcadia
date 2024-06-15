@@ -4,7 +4,11 @@ import { FaFacebookSquare } from "react-icons/fa";
 import { FaInstagram } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 
-export const redes = [
+interface SocialIcon {
+  icon: JSX.Element;
+}
+
+export const redes: SocialIcon[] = [
   { icon: <FaFacebookSquare className="text-white" /> },
   { icon: <FaInstagram className="text-white" /> },
   { icon: <FaLinkedinIn className="text-white" /> },

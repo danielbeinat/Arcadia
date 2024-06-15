@@ -6,9 +6,24 @@ import { GiGraduateCap } from "react-icons/gi";
 import { FaFlag } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 
+interface Item {
+  id: number;
+  image: string;
+  name: string;
+  Type: string;
+  duration: string;
+  program: string;
+  title?: string;
+  degree?: string;
+  category: string;
+  Time: string;
+  description?: string;
+  date?: string;
+}
+
 export const Online = () => {
   const navigate = useNavigate();
-  const handleCardClick = (id) => {
+  const handleCardClick = (id: number) => {
     window.scrollTo(0, 0);
 
     navigate(`/career/${id}`);
@@ -26,11 +41,10 @@ export const Online = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 md:mt-20 mt-10 justify-items-center ">
-          {Degree.map((item) => (
+          {Degree.map((item: Item) => (
             <article
               className="flex flex-col gap-3 lg:w-[340px] w-[290px] mb-10 shadow-lg rounded pb-5 transform transition duration-500 hover:scale-105 cursor-pointer"
               key={item.id}
-              alt={item.name}
               onClick={() => handleCardClick(item.id)}
             >
               <img

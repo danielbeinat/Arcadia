@@ -2,7 +2,11 @@ import { FaUser } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { redes } from "./Icons";
 
-export const TopBar = () => {
+interface Items {
+  icon: JSX.Element;
+}
+
+export const TopBar: React.FC = () => {
   return (
     <>
       <div className="flex items-center justify-between bg-black md:px-10 px-4 py-1">
@@ -11,7 +15,7 @@ export const TopBar = () => {
             Seguinos:
           </h1>
           <div className="flex items-center gap-2">
-            {redes.map((item, i) => (
+            {redes.map((item: Items, i) => (
               <a key={i}>{item.icon}</a>
             ))}
           </div>

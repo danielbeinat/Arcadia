@@ -1,24 +1,24 @@
 import { TopBar } from "./Components/Header/NavBar/TopBar/TopBar";
 import { NavBar } from "./Components/Header/NavBar/NavBar";
 import { Route, Routes } from "react-router-dom";
-import { Home } from "../src/pages/Home/Home";
-import { About } from "../src/pages/About/About";
-import { Courses } from "../src/pages/Courses/Courses";
-import { OnCampus } from "../src/pages/Degrees/OnCampus";
-import { Online } from "../src/pages/Degrees/Online";
-import { Portal } from "../src/pages/Students/Portal";
-import { Services } from "../src/pages/Students/Services";
-import { Info } from "../src/pages/NewStudents/Info";
-import { Requirements } from "../src/pages/NewStudents/Requirements";
-import { ChatBox } from "../src/Components/ChatBox/ChatBox";
-import { Footer } from "../src/Components/Footer/Footer";
+import { Home } from "./pages/Home/Home";
+import { About } from "./pages/About/About";
+import { Courses } from "./pages/Courses/Courses";
+import { OnCampus } from "./pages/Degrees/OnCampus";
+import { Online } from "./pages/Degrees/Online";
+import { Portal } from "./pages/Students/Portal";
+import { Services } from "./pages/Students/Services";
+import { Info } from "./pages/NewStudents/Info";
+import { Requirements } from "./pages/NewStudents/Requirements";
+import { ChatBox } from "./Components/ChatBox/ChatBox";
+import { Footer } from "./Components/Footer/Footer";
 import { Login } from "./pages/Count/Login";
-import { Inscription } from "../src/pages/Inscription/Inscription";
-import { Category } from "../src/Components/Category/Category";
-import { Register } from "../src/pages/Count/Register";
-import { DisplayDegree } from "../src/Components/DisplayDegree/DisplayDegree";
+import { Inscription } from "./pages/Inscription/Inscription";
+import { Category } from "./Components/Category/Category";
+import { Register } from "./pages/Count/Register";
+import { DisplayDegree } from "./Components/DisplayDegree/DisplayDegree";
 
-export const App = () => {
+export const App: React.FC = () => {
   return (
     <>
       <TopBar />

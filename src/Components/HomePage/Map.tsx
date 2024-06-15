@@ -4,7 +4,7 @@ import { FaWhatsapp } from "react-icons/fa";
 import { LuMapPin } from "react-icons/lu";
 import { IoMailOutline } from "react-icons/io5";
 
-export const Map = () => {
+export const Map: React.FC = () => {
   return (
     <React.Fragment>
       <section className="bg-gray-100">
@@ -25,7 +25,6 @@ export const Map = () => {
                   width="100%"
                   height="480"
                   style={{ border: 0 }}
-                  allowFullScreen=""
                   loading="lazy"
                   title="Location Map"
                 ></iframe>

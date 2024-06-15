@@ -1,4 +1,4 @@
-export const Requirements = () => {
+export const Requirements: React.FC = () => {
   return (
     <>
       <div className="flex flex-col justify-center px-5 lg:px-20 mt-10 mb-20">

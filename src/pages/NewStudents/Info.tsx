@@ -1,4 +1,4 @@
-export const Info = () => {
+export const Info: React.FC = () => {
   return (
     <>
       <div className="flex flex-col px-5 justify-center lg:px-20 mt-10 mb-20">

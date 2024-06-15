@@ -1,6 +1,6 @@
 import React from "react";
 
-export const Inscription = () => {
+export const Inscription: React.FC = () => {
   return (
     <>
       <div className="w-full md:py-10 md:px-28 py-5 px-5 bg-indigo-600 mt-5 flex items-center justify-start">
@@ -18,8 +18,8 @@ export const Inscription = () => {
         </h1>
 
         <div className="py-5">
-          <div class="breadcrumb flat">
-            <a class="active">1 .Tus datos</a>
+          <div className="breadcrumb flat">
+            <a className="active">1 .Tus datos</a>
             <a>2. Solicitud</a>
             <a>3. Reserva de vacante</a>
             <a>4. Gracias</a>

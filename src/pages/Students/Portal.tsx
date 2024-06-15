@@ -1,13 +1,11 @@
-import { Link } from "react-router-dom";
-
-export const Login = () => {
+export const Portal: React.FC = () => {
   return (
     <>
       <div className="flex min-h-full flex-col items-center justify-center py-5 sm:px-6 lg:px-8">
         <div className="flex min-h-full md:w-[400px] max-w-md shadow-2xl flex-1 rounded-xl flex-col justify-center mb-16 px-6 py-5 lg:px-8">
           <div className="sm:mx-auto sm:w-full sm:max-w-sm">
             <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-700">
-              Iniciar sesion
+              Iniciar sesión
             </h2>
           </div>
 
@@ -45,7 +43,7 @@ export const Login = () => {
                       href="#"
                       className="font-semibold text-black hover:text-gray-500"
                     >
-                      olvidaste tu contraseña?
+                      ¿olvidaste tu contraseña?
                     </a>
                   </div>
                 </div>
@@ -66,20 +64,19 @@ export const Login = () => {
                   type="submit"
                   className="flex w-full justify-center rounded-md bg-black px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 >
-                  Iniciar Sesion
+                  Iniciar Sesión
                 </button>
               </div>
             </form>
 
             <p className="mt-10 text-center text-sm text-gray-500">
-              No tienes cuenta?
-              <Link
-                to="/register"
+              ¿No tienes cuenta?
+              <a
+                href="#"
                 className="font-semibold px-1 leading-6 text-black hover:text-gray-500"
-                onClick={() => window.scrollTo(0, 0)}
               >
                 Registrate
-              </Link>
+              </a>
             </p>
           </div>
         </div>

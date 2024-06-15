@@ -1,7 +1,6 @@
-import React from "react";
 import { Link } from "react-router-dom";
 
-export const Academy = () => {
+export const Academy: React.FC = () => {
   return (
     <>
       <div className="container mx-auto md:px-10 py-10 px-5 mt-10">

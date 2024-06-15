@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { AllDegrees } from "../../assets/AllDegrees/AllDegrees";
 
-export const DisplayDegree = () => {
+export const DisplayDegree: React.FC = () => {
   const { careerId } = useParams();
   const career = AllDegrees.find((item) => item.id === Number(careerId));
 
@@ -63,7 +63,7 @@ export const DisplayDegree = () => {
               </div>
             </div>
             <div className="w-full hidden md:block">
-              <img className="w-[500px] h-auto" src={career.image} alt="" />
+              <img className="w-[500px] h-auto" src={career.image} />
             </div>
           </div>
         </div>

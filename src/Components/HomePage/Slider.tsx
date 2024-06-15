@@ -1,3 +1,4 @@
+import { CSSProperties } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/effect-fade";
@@ -7,20 +8,30 @@ import { EffectFade, Navigation, Pagination, Autoplay } from "swiper/modules";
 import { Banner } from "../../assets/BannerSlider/BannerSlider";
 import { Link } from "react-router-dom";
 
-export const Slider = () => {
+interface Item {
+  id: number;
+  image: string;
+  title: string;
+  description: string;
+  to: string;
+}
+
+export const Slider: React.FC = () => {
+  const swiperStyle: CSSProperties = {
+    "--swiper-navigation-size": "15px",
+    "--swiper-pagination-fontsize": "10px",
+    "--swiper-pagination-color": "white",
+    "--swiper-pagination-bullet-inactive-color": "white",
+    "--swiper-pagination-bullet-inactive-opacity": "0.5",
+    "--swiper-pagination-bullet-size": "13px",
+    "--swiper-pagination-bullet-horizontal-gap": "5px",
+    "--swiper-pagination-bullet-vertical-gap": "5px",
+    "--swiper-navigation-color": "white",
+  } as CSSProperties;
+
   return (
     <Swiper
-      style={{
-        "--swiper-navigation-size": "15px",
-        "--swiper-pagination-fontsize": "10px",
-        "--swiper-pagination-color": "white",
-        "--swiper-pagination-bullet-inactive-color": "white",
-        "--swiper-pagination-bullet-inactive-opacity": "0.5",
-        "--swiper-pagination-bullet-size": "13px",
-        "--swiper-pagination-bullet-horizontal-gap": "5px",
-        "--swiper-pagination-bullet-vertical-gap": "5px",
-        "--swiper-navigation-color": "white",
-      }}
+      style={swiperStyle}
       spaceBetween={30}
       effect={"fade"}
       navigation={{
@@ -38,12 +49,12 @@ export const Slider = () => {
       modules={[EffectFade, Navigation, Pagination, Autoplay]}
       className="mySwiper w-full h-[500px] lg:h-[500px]"
     >
-      {Banner.map((item) => (
+      {Banner.map((item: Item) => (
         <SwiperSlide key={item.id} className="swiper-slide relative">
           <img
             className="w-full h-full brightness-75 lg:h-full object-cover"
             src={item.image}
-            alt="Banner"
+            alt={item.title}
             loading="lazy"
           />
           <div className="absolute md:hidden inset-0 bg-gray-800 opacity-50"></div>
@@ -52,7 +63,7 @@ export const Slider = () => {
             <h1 className="text-xl text-center md:text-3xl text-white font-bold uppercase">
               {item.title}
             </h1>
-            <p className=" text-sm text-center text-white md:text-xl">
+            <p className="text-sm text-center text-white md:text-xl">
               {item.description}
             </p>
             <Link
@@ -65,17 +76,16 @@ export const Slider = () => {
                 });
               }}
             >
-              mas informacion
+              más información
             </Link>
           </div>
         </SwiperSlide>
       ))}
 
-      {/* Estilos personalizados con Tailwind CSS */}
       <div className="swiper-button-next bg-gradient-to-tr to-blue-700 from-indigo-900 hidden lg:flex text-white h-10 w-10 p-6 rounded-lg text-xs"></div>
       <div className="swiper-button-prev bg-gradient-to-tr to-blue-700 from-indigo-900 hidden lg:flex text-white h-10 w-10 p-6 rounded-lg text-xs"></div>
       <div className="swiper-pagination text-white">
-        <span className="swiper-pagination-bullet bg-white w-2.5 h-2.5 shadow-inner "></span>
+        <span className="swiper-pagination-bullet bg-white w-2.5 h-2.5 shadow-inner"></span>
       </div>
     </Swiper>
   );
