@@ -1,4 +1,4 @@
-import { TopBar } from "./Components/Header/NavBar/TopBar/TopBar";
+// import { TopBar } from "./Components/Header/NavBar/TopBar/TopBar";
 import { NavBar } from "./Components/Header/NavBar/NavBar";
 import { Route, Routes } from "react-router-dom";
 import { Home } from "./pages/Home/Home";
@@ -21,7 +21,7 @@ import { DisplayDegree } from "./Components/DisplayDegree/DisplayDegree";
 export const App: React.FC = () => {
   return (
     <>
-      <TopBar />
+      {/* <TopBar /> */}
       <NavBar />
 
       <Routes>

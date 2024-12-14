@@ -12,7 +12,7 @@ export const Inscription: React.FC = () => {
       <div className="w-full py-10 md:px-28 px-5 flex mb-10 flex-col gap-5">
         <h1 className="md:text-[15px] text-[13px] md:w-5/6 font-bold text-gray-500">
           Estás muy cerca de formar parte de la comunidad de la Universidad de
-          Palermo. Completá el formulario para iniciar el proceso de
+          Arcadia. Completá el formulario para iniciar el proceso de
           inscripción, continuar formularios anteriores o realizar el pago de la
           matricula de inscripción.
         </h1>

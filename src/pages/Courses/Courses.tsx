@@ -3,6 +3,7 @@ import { AllDegrees } from "../../assets/AllDegrees/AllDegrees";
 import { MdCalendarMonth } from "react-icons/md";
 import { FaUserGraduate } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
 interface Item {
   id: number;
@@ -39,44 +40,48 @@ export const Courses: React.FC = () => {
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 md:mt-20 mt-10 justify-items-center ">
+        <div className="grid grid-cols-1 mt-[100px] px-4 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {courses.map((item: Item) => (
-            <article
-              className="flex flex-col gap-3 md:w-[340px] w-[290px] mb-10 shadow-lg rounded pb-5 transform transition duration-500 hover:scale-105 cursor-pointer"
+            <motion.article
               key={item.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              whileHover={{ scale: 1.03 }}
+              className="bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer"
               onClick={() => handleCardClick(item.id)}
             >
               <img
                 src={item.image}
-                alt="image"
-                className="w-full h-[200px] object-cover rounded-t"
+                alt={item.name}
+                className="w-full h-48 object-cover"
               />
-              <h1 className="text-xl text-center text-gray-700 font-bold">
-                {item.name}
-              </h1>
-
-              <div className="px-3 flex flex-col">
-                <hr className=" border border-gray-300" />
-
-                <div className="flex flex-col gap-3 mt-5">
-                  <div className="  ">
-                    <MdCalendarMonth className="inline mr-2 text-2xl bg-indigo-800 text-white p-1 rounded-full " />
-                    <span>
-                      <span className="font-bold">duracion:</span>{" "}
+              <div className="p-6">
+                <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">
+                  {item.name}
+                </h2>
+                <div className="space-y-3">
+                  <div className="flex items-center text-gray-700">
+                    <div className="bg-indigo-100 rounded-full p-2 mr-3">
+                      <MdCalendarMonth className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <span className="font-semibold">Duración:</span>{" "}
                       {item.duration}
-                    </span>
+                    </div>
                   </div>
-
-                  <div className="">
-                    <FaUserGraduate className="inline mr-2 text-2xl bg-indigo-800 text-white p-1 rounded-full" />
-                    <span>
-                      <span className="font-bold">Programa:</span>{" "}
+                  <div className="flex items-center text-gray-700">
+                    <div className="bg-indigo-100 rounded-full p-2 mr-3">
+                      <FaUserGraduate className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <span className="font-semibold">Programa:</span>{" "}
                       {item.program}
-                    </span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </article>
+            </motion.article>
           ))}
         </div>
       </div>

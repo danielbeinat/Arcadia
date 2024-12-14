@@ -1,68 +1,129 @@
-import { useState } from "react";
-import { BsChatFill } from "react-icons/bs";
-import { IoMdClose } from "react-icons/io";
+import React, { useState } from "react";
+import { MessageCircle, X, Send } from "lucide-react";
 
-export const ChatBox: React.FC = () => {
-  const [Show, setShow] = useState<boolean>(false);
+export const ChatBox = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Handle form submission
+    console.log("Form submitted:", formData);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   return (
-    <>
+    <div className="bg-gray-50">
+      {/* Chat Toggle Button */}
       <button
-        onClick={() => setShow(!Show)}
-        className="fixed md:bottom-8 bottom-4 right-3 md:right-5 z-50 bg-blue-700 p-4 shadow-2xl rounded-full p-2"
+        onClick={() => setIsOpen(!isOpen)}
+        className="fixed bottom-6 right-6 z-50 p-4 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 group"
       >
-        {Show ? (
-          <IoMdClose className="text-3xl text-white " />
+        {isOpen ? (
+          <X className="w-6 h-6 text-white transition-transform duration-200 rotate-0 group-hover:rotate-90" />
         ) : (
-          <BsChatFill className="text-3xl text-white " />
+          <MessageCircle className="w-6 h-6 text-white transition-transform duration-200 group-hover:scale-110" />
         )}
       </button>
 
-      {Show && (
-        <div className="fixed md:bottom-24 md:right-8 bottom-0 right-0 z-50  bg-white shadow-2xl md:rounded-xl md:h-auto w-full h-full mx-auto md:w-96 ">
-          <div className="flex items-center justify-between md:rounded-t-xl p-4 bg-blue-700">
-            <h1 className="text-sm text-white font-bold">
-              Informes e Inscripción - Instituto Arcadia
-            </h1>
-            <button onClick={() => setShow(!Show)}>
-              <IoMdClose className="text-3xl text-white" />
-            </button>
-          </div>
+      {/* Chat Box */}
+      {isOpen && (
+        <div className="fixed bottom-24 right-6 z-50 w-full max-w-sm animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-violet-600 to-indigo-600 p-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-white font-semibold">
+                  Informes e Inscripción - Instituto Arcadia
+                </h2>
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="text-white/80 hover:text-white transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
 
-          <div className="p-4 pb-10 flex flex-col items-center justify-center gap-4">
-            <h1 className="text-center font-bold text-gray-500">
-              Por favor completá este formulario para empezar a charlar con el
-              próximo agente disponible.
-            </h1>
+            {/* Content */}
+            <div className="p-6">
+              <p className="text-gray-600 text-sm text-center mb-6">
+                Complete el formulario para chatear con el próximo agente
+                disponible
+              </p>
 
-            <form
-              onSubmit={(e) => e.preventDefault()}
-              className="flex flex-col border border-gray-300 rounded px-4 py-8 gap-4"
-              action=""
-            >
-              <input
-                placeholder="Nombre"
-                className="border md:w-80 w-64 border-gray-300 px-2 py-3 rounded"
-                type="text"
-              />
-              <input
-                placeholder="Email"
-                className="border border-gray-300 px-2 py-3 rounded"
-                type="text"
-              />
-              <input
-                placeholder="Asunto"
-                className="border border-gray-300 px-2 py-3 rounded"
-                type="text"
-              />
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-4">
+                  {/* Name Input */}
+                  <div className="relative">
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all duration-200 peer placeholder-transparent"
+                      placeholder="Nombre"
+                      required
+                    />
+                    <label className="absolute left-4 -top-2.5 bg-white px-1 text-sm text-gray-600 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-3 peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-violet-600">
+                      Nombre
+                    </label>
+                  </div>
 
-              <button className="bg-blue-700 text-white p-2 rounded">
-                Iniciar Chat
-              </button>
-            </form>
+                  {/* Email Input */}
+                  <div className="relative">
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all duration-200 peer placeholder-transparent"
+                      placeholder="Email"
+                      required
+                    />
+                    <label className="absolute left-4 -top-2.5 bg-white px-1 text-sm text-gray-600 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-3 peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-violet-600">
+                      Email
+                    </label>
+                  </div>
+
+                  {/* Subject Input */}
+                  <div className="relative">
+                    <input
+                      type="text"
+                      name="subject"
+                      value={formData.subject}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all duration-200 peer placeholder-transparent"
+                      placeholder="Asunto"
+                      required
+                    />
+                    <label className="absolute left-4 -top-2.5 bg-white px-1 text-sm text-gray-600 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-3 peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-violet-600">
+                      Asunto
+                    </label>
+                  </div>
+                </div>
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  className="w-full py-3 px-4 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-lg font-medium hover:from-violet-500 hover:to-indigo-500 transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 group"
+                >
+                  Iniciar Chat
+                  <Send className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };

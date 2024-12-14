@@ -1,67 +1,109 @@
+import React from "react";
+import { motion } from "framer-motion";
+
 export const Info: React.FC = () => {
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.2, delayChildren: 0.1 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1 },
+  };
+
   return (
-    <>
-      <div className="flex flex-col px-5 justify-center lg:px-20 mt-10 mb-20">
-        <h1 className="text-3xl font-bold text-start">Ingresantes</h1>
-        <hr />
+    <section className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 py-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="space-y-16"
+        >
+          {/* Header Section */}
+          <motion.div className="text-center space-y-4">
+            <motion.div
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="inline-block px-4 py-2 bg-blue-50 rounded-full"
+            >
+              <span className="text-blue-600 font-medium">
+                Información General
+              </span>
+            </motion.div>
+            <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
+              Ingresantes
+            </h1>
+            <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-indigo-600 mx-auto rounded-full" />
+          </motion.div>
 
-        <div className="mt-10">
-          <div className="flex justify-start bg-gray-200 p-5 mb-5">
-            <h1 className="text-[17px] font-bold">
-              Requisitos Académicos Obligatorios (RAO)
-            </h1>
-          </div>
-          <p>
-            Quienes ingresen a cualquiera de las carreras de la FCEyN y hayan
-            completado los requerimientos administrativos deberán acreditar,
-            previo a cursar las asignaturas correspondientes a sus Planes de
-            Estudio, los dos Requisitos Académicos Obligatorios (RAO):
-            Introducción a la Matemática -IAM- y el Taller “Leer y Pensar la
-            Ciencia” -TLPC-. Además, habrá 2 reuniones del Taller de
-            Introducción a la Vida Universitaria -TIVU-, de carácter no
-            obligatorio. Estos RAO son idénticos para cualquiera de las 9
-            carreras de la FCEyN. Ante cualquier duda sobre estas carreras,
-            pueden ingresar a la Sección Estudiantes. A continuación se puede
-            encontrar la información de cada actividad: fechas, inscripciones,
-            contenidos, etc.
-          </p>
-        </div>
+          {/* Main Content */}
+          <div className="grid gap-8">
+            {/* Requisitos Académicos Obligatorios */}
+            <motion.div
+              variants={itemVariants}
+              className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 overflow-hidden"
+            >
+              <div className="p-8">
+                <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 mb-6">
+                  Requisitos Académicos Obligatorios (RAO)
+                </h2>
+                <p className="text-gray-600 leading-relaxed">
+                  Quienes ingresen a cualquiera de las carreras de la FCEyN y
+                  hayan completado los requerimientos administrativos deberán
+                  acreditar, previo a cursar las asignaturas correspondientes a
+                  sus Planes de Estudio, los dos Requisitos Académicos
+                  Obligatorios (RAO): Introducción a la Matemática -IAM- y el
+                  Taller “Leer y Pensar la Ciencia” -TLPC-. Además, habrá 2
+                  reuniones del Taller de Introducción a la Vida Universitaria
+                  -TIVU-, de carácter no obligatorio.
+                </p>
+              </div>
+            </motion.div>
 
-        <div className="mt-8">
-          <div className="flex justify-start bg-gray-200 p-5 mb-5 ">
-            <h1 className="text-[17px] font-bold">
-              Introducción a la Matemática (IAM)
-            </h1>
+            {/* Introducción a la Matemática */}
+            <motion.div
+              variants={itemVariants}
+              className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 overflow-hidden"
+            >
+              <div className="p-8">
+                <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 mb-6">
+                  Introducción a la Matemática (IAM)
+                </h2>
+                <p className="text-gray-600 leading-relaxed">
+                  El curso Introducción a la Matemática se dictará en 2
+                  ediciones equivalentes. Recordamos que la aprobación de este
+                  requisito es obligatoria para continuar con las asignaturas
+                  específicas de cada carrera.
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Herramientas Digitales */}
+            <motion.div
+              variants={itemVariants}
+              className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 overflow-hidden"
+            >
+              <div className="p-8">
+                <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 mb-6">
+                  Herramientas Digitales (HD)
+                </h2>
+                <p className="text-gray-600 leading-relaxed">
+                  Este curso cubre temas como el manejo de software de
+                  ofimática, herramientas de comunicación en línea, y uso seguro
+                  de Internet. La aprobación de este curso es obligatoria y se
+                  ofrece en formato virtual para mayor flexibilidad.
+                </p>
+              </div>
+            </motion.div>
           </div>
-          <p>
-            El curso Introducción a la Matemática se dictará en 2 ediciones que
-            son equivalentes entre sí, por lo que solo deberá aprobarse una de
-            ellas. Además, se desarrolló una instancia nivelatoria con clases de
-            explicación de temas y consultas. Recordamos que la aprobación de
-            este requisito es obligatoria para continuar con las asignaturas
-            específicas de cada carrera (es decir, la aprobación de la instancia
-            de IAM de febrero-marzo habilita la continuidad de las asignaturas
-            en la primera mitad del año, mientras que la aprobación de la
-            instancia de abril-julio lo hace para la segunda mitad del año).
-          </p>
-        </div>
-        <div className="mt-8">
-          <div className="flex justify-start bg-gray-200 p-5 mb-5">
-            <h1 className="text-[17px] font-bold">
-              Herramientas Digitales (HD)
-            </h1>
-          </div>
-          <p>
-            El curso Herramientas Digitales está diseñado para proporcionar a
-            los estudiantes las habilidades necesarias en el uso de tecnologías
-            digitales que serán fundamentales en su vida académica y
-            profesional. Este curso cubre temas como el manejo de software de
-            ofimática, herramientas de comunicación en línea, y uso seguro de
-            Internet. La aprobación de este curso es obligatoria para todos los
-            ingresantes y se ofrece en formato virtual para mayor flexibilidad.
-          </p>
-        </div>
+        </motion.div>
       </div>
-    </>
+    </section>
   );
 };
