@@ -1,4 +1,4 @@
-import Presencial from "../../assets/AllDegrees/Images/Presencial.webp";
+import presencial from "../../assets/AllDegrees/Images/presencial.png";
 import { AllDegrees } from "../../assets/AllDegrees/AllDegrees";
 import { MdCalendarMonth } from "react-icons/md";
 import { FaUserGraduate } from "react-icons/fa6";
@@ -33,12 +33,8 @@ export const OnCampus: React.FC = () => {
   return (
     <>
       <div className="mb-20">
-        <div className="w-full md:h-[290px]  mt-10">
-          <img
-            className="w-full md:h-[290px] object-cover rounded-t"
-            src={Presencial}
-            alt="Presencial"
-          />
+        <div className="">
+          <img className="" src={presencial} alt="Presencial" />
         </div>
 
         <div className="grid grid-cols-1 mt-[100px] px-4 md:grid-cols-2 lg:grid-cols-3 gap-8">

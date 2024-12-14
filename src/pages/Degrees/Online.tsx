@@ -1,4 +1,4 @@
-import Virtual from "../../assets/AllDegrees/Images/Virtual.webp";
+import online from "../../assets/AllDegrees/Images/online.png";
 import { AllDegrees } from "../../assets/AllDegrees/AllDegrees";
 import { MdCalendarMonth } from "react-icons/md";
 import { FaUserGraduate } from "react-icons/fa6";
@@ -33,12 +33,8 @@ export const Online = () => {
   return (
     <>
       <div className="mb-20">
-        <div className="w-full mt-10 md:h-[290px]">
-          <img
-            className="w-full rounded-t object-cover md:h-[290px]"
-            src={Virtual}
-            alt="virtual"
-          />
+        <div className="">
+          <img className="object-cover" src={online} alt="virtual" />
         </div>
 
         <div className="grid grid-cols-1 mt-[100px] px-4 md:grid-cols-2 lg:grid-cols-3 gap-8">

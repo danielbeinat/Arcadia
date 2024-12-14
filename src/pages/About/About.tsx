@@ -91,7 +91,6 @@ export const About: React.FC = () => {
           animate="visible"
           className="space-y-16"
         >
-          {/* Header Section */}
           <motion.div className="text-center space-y-4">
             <motion.div
               initial={{ scale: 0.5, opacity: 0 }}
@@ -109,7 +108,6 @@ export const About: React.FC = () => {
             <div className="w-24 h-1 bg-gradient-to-r from-indigo-600 to-purple-600 mx-auto rounded-full" />
           </motion.div>
 
-          {/* Mission & Vision Section */}
           <div className="grid md:grid-cols-2 gap-8">
             {sections.map((section, index) => (
               <motion.div
@@ -139,7 +137,6 @@ export const About: React.FC = () => {
             ))}
           </div>
 
-          {/* Values Section */}
           <div className="space-y-8">
             <motion.h2
               initial={{ opacity: 0 }}
@@ -174,7 +171,6 @@ export const About: React.FC = () => {
             </div>
           </div>
 
-          {/* History Section */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}

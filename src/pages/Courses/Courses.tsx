@@ -1,4 +1,4 @@
-import cursos from "../../assets/AllDegrees/Images/cursos.webp";
+import cursos from "../../assets/AllDegrees/Images/cursos.png";
 import { AllDegrees } from "../../assets/AllDegrees/AllDegrees";
 import { MdCalendarMonth } from "react-icons/md";
 import { FaUserGraduate } from "react-icons/fa6";
@@ -32,12 +32,8 @@ export const Courses: React.FC = () => {
   return (
     <>
       <div className="mb-20">
-        <div className="w-full md:h-[290px] mt-10">
-          <img
-            className="w-full md:h-[290px] object-cover rounded-t"
-            src={cursos}
-            alt="image"
-          />
+        <div className="">
+          <img className="" src={cursos} alt="image" />
         </div>
 
         <div className="grid grid-cols-1 mt-[100px] px-4 md:grid-cols-2 lg:grid-cols-3 gap-8">

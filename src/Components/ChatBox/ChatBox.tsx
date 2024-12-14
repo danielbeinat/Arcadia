@@ -33,9 +33,8 @@ export const ChatBox = () => {
       </button>
 
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-50 w-full max-w-sm animate-fade-in">
+        <div className="fixed md:bottom-24 md:right-6 bottom-6 px-4 z-50 md:w-full md:max-w-sm animate-fade-in">
           <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
-            {/* Header */}
             <div className="bg-gradient-to-r from-violet-600 to-indigo-600 p-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-white font-semibold">
@@ -50,7 +49,6 @@ export const ChatBox = () => {
               </div>
             </div>
 
-            {/* Content */}
             <div className="p-6">
               <p className="text-gray-600 text-sm text-center mb-6">
                 Complete el formulario para chatear con el próximo agente
@@ -59,7 +57,6 @@ export const ChatBox = () => {
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-4">
-                  {/* Name Input */}
                   <div className="relative">
                     <input
                       type="text"
@@ -75,7 +72,6 @@ export const ChatBox = () => {
                     </label>
                   </div>
 
-                  {/* Email Input */}
                   <div className="relative">
                     <input
                       type="email"
@@ -91,7 +87,6 @@ export const ChatBox = () => {
                     </label>
                   </div>
 
-                  {/* Subject Input */}
                   <div className="relative">
                     <input
                       type="text"
@@ -108,7 +103,6 @@ export const ChatBox = () => {
                   </div>
                 </div>
 
-                {/* Submit Button */}
                 <button
                   type="submit"
                   className="w-full py-3 px-4 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-lg font-medium hover:from-violet-500 hover:to-indigo-500 transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 group"

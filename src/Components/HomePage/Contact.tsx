@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import students from "../../assets/students.webp";
+import students from "../../assets/AllDegrees/Images/students.webp";
 
 export const Contact: React.FC = () => {
   const containerVariants = {

@@ -48,7 +48,6 @@ export const Slider: React.FC = () => {
       >
         {Banner.map((item: Item) => (
           <SwiperSlide key={item.id} className="relative overflow-hidden">
-            {/* Background Image with Modern Gradient */}
             <div className="absolute inset-0">
               <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent z-10" />
               <img
@@ -59,7 +58,6 @@ export const Slider: React.FC = () => {
               />
             </div>
 
-            {/* Content with Modern Layout */}
             <div className="relative z-20 h-full container mx-auto px-6">
               <div className="flex flex-col justify-center h-full max-w-3xl">
                 <span className="text-emerald-400 text-sm md:text-base uppercase tracking-wider mb-4 font-medium">
@@ -88,7 +86,6 @@ export const Slider: React.FC = () => {
           </SwiperSlide>
         ))}
 
-        {/* Modern Pagination */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30">
           <div className="custom-pagination flex gap-3 px-4 py-2 rounded-full bg-black/20 backdrop-blur-sm"></div>
         </div>

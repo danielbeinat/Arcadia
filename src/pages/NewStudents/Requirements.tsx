@@ -60,7 +60,6 @@ export const Requirements: React.FC = () => {
           animate="visible"
           className="space-y-16"
         >
-          {/* Header Section */}
           <motion.div className="text-center space-y-4">
             <motion.div
               initial={{ scale: 0.5, opacity: 0 }}
@@ -78,9 +77,7 @@ export const Requirements: React.FC = () => {
             <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-indigo-600 mx-auto rounded-full" />
           </motion.div>
 
-          {/* Main Content */}
           <div className="grid lg:grid-cols-2 gap-8">
-            {/* Academic Requirements */}
             <motion.div
               variants={itemVariants}
               className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 overflow-hidden"
@@ -123,7 +120,6 @@ export const Requirements: React.FC = () => {
               </div>
             </motion.div>
 
-            {/* Additional Requirements */}
             <motion.div
               variants={itemVariants}
               className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 overflow-hidden"
