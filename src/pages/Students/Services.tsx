@@ -52,7 +52,6 @@ export const Services: React.FC = () => {
           animate="visible"
           className="space-y-16"
         >
-          {/* Header Section */}
           <motion.div className="text-center space-y-4">
             <motion.div
               initial={{ scale: 0.5, opacity: 0 }}
@@ -70,7 +69,6 @@ export const Services: React.FC = () => {
             <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-indigo-600 mx-auto rounded-full" />
           </motion.div>
 
-          {/* Services List */}
           <div className="grid lg:grid-cols-2 gap-8">
             {services.map((service, index) => (
               <motion.div

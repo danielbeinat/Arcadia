@@ -11,7 +11,6 @@ export const ChatBox = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
     console.log("Form submitted:", formData);
   };
 
@@ -22,7 +21,6 @@ export const ChatBox = () => {
 
   return (
     <div className="bg-gray-50">
-      {/* Chat Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="fixed bottom-6 right-6 z-50 p-4 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 group"
@@ -34,7 +32,6 @@ export const ChatBox = () => {
         )}
       </button>
 
-      {/* Chat Box */}
       {isOpen && (
         <div className="fixed bottom-24 right-6 z-50 w-full max-w-sm animate-fade-in">
           <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
