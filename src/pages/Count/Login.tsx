@@ -7,8 +7,8 @@ export const Login: React.FC = () => {
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-xl p-8 space-y-8">
           <div className="text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-purple-100 mb-4">
-              <FiLogIn className="w-8 h-8 text-purple-600" />
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-indigo-600 to-indigo-500  mb-4">
+              <FiLogIn className="w-8 h-8 text-white" />
             </div>
             <h2 className="text-3xl font-bold text-gray-800">
               Bienvenido de nuevo
@@ -31,7 +31,7 @@ export const Login: React.FC = () => {
                 type="email"
                 autoComplete="email"
                 required
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-purple-500 focus:ring-purple-500 transition-colors duration-200 bg-gray-50 focus:bg-white outline-none"
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-indigo-500 transition-colors duration-200 bg-gray-50 focus:bg-white outline-none"
                 placeholder="tu@email.com"
               />
             </div>
@@ -47,7 +47,7 @@ export const Login: React.FC = () => {
                 </label>
                 <a
                   href="#"
-                  className="text-sm font-medium text-purple-600 hover:text-purple-500 transition-colors duration-200"
+                  className="text-sm font-medium text-indigo-600 hover:text-indigo-500 transition-colors duration-200"
                 >
                   ¿Olvidaste tu contraseña?
                 </a>
@@ -58,14 +58,14 @@ export const Login: React.FC = () => {
                 type="password"
                 autoComplete="current-password"
                 required
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-purple-500 focus:ring-purple-500 transition-colors duration-200 bg-gray-50 focus:bg-white outline-none"
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-indigo-500 transition-colors duration-200 bg-gray-50 focus:bg-white outline-none"
                 placeholder="••••••••"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full bg-purple-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors duration-200 flex items-center justify-center gap-2"
+              className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-200 flex items-center justify-center gap-2"
             >
               <FiLogIn className="w-5 h-5" />
               Iniciar Sesión
@@ -86,7 +86,7 @@ export const Login: React.FC = () => {
           <div className="text-center">
             <Link
               to="/register"
-              className="inline-flex items-center gap-2 text-purple-600 hover:text-purple-500 font-medium transition-colors duration-200"
+              className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-500 font-medium transition-colors duration-200"
               onClick={() => window.scrollTo(0, 0)}
             >
               Registrate aquí
