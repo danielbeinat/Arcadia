@@ -32,16 +32,19 @@ export const Inscription: React.FC = () => {
               className="border border-gray-400 text-gray-400 p-3 rounded"
               placeholder="*Nombre/s"
               type="text"
+              required
             />
             <input
               className="border border-gray-400 text-gray-400 p-3 rounded"
               placeholder="*Apellido/s"
               type="text"
+              required
             />
             <input
               className=" border border-gray-400 text-gray-400 p-3 rounded"
               placeholder="*E-mail"
               type="text"
+              required
             />
           </div>
           <div className="flex flex-col gap-5 md:w-[50%] w-full">
@@ -75,12 +78,14 @@ export const Inscription: React.FC = () => {
                 className="w-full border border-gray-400 text-gray-400 p-3 rounded"
                 placeholder="*Número"
                 type="text"
+                required
               />
             </div>
             <input
               className="border border-gray-400 text-gray-400 p-3 rounded"
               placeholder="*Nacionalidad"
               type="text"
+              required
             />
           </div>
 
@@ -115,6 +120,7 @@ export const Inscription: React.FC = () => {
                 className="w-full border border-gray-400 text-gray-400 p-3 rounded"
                 placeholder="Área"
                 type="text"
+                required
               />
               <input
                 className="w-full border border-gray-400 text-gray-400 p-3 rounded"

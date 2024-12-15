@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
-import logo from "../../../assets/AllDegrees/Images/Logo.png";
+import logo from "../../../assets/AllDegrees/Images/Logo.webp";
 import { Link } from "react-router-dom";
 
 interface Sublink {

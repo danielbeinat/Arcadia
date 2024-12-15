@@ -1,4 +1,4 @@
-import presencial from "../../assets/AllDegrees/Images/presencial.png";
+import presencial from "../../assets/AllDegrees/Images/presencial.webp";
 import { AllDegrees } from "../../assets/AllDegrees/AllDegrees";
 import { MdCalendarMonth } from "react-icons/md";
 import { FaUserGraduate } from "react-icons/fa6";
@@ -33,9 +33,14 @@ export const OnCampus: React.FC = () => {
   return (
     <>
       <div className="mb-20">
-        <div className="">
+        <motion.div
+          initial={{ opacity: 0, y: -50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="w-full "
+        >
           <img className="" src={presencial} alt="Presencial" />
-        </div>
+        </motion.div>
 
         <div className="grid grid-cols-1 mt-[100px] px-4 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {Degree.map((item: Item) => (
