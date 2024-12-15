@@ -165,7 +165,7 @@ export const Map: React.FC = () => {
               className="border-t border-gray-100 px-8 py-6"
             >
               <a
-                href="https://goo.gl/maps/your-location-link"
+                href="https://www.google.com/maps/place/Av.+Santa+Fe+123,+C1123AAA+CABA,+Argentina/@-34.5968801,-58.3832717,17z"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors duration-200 group"
