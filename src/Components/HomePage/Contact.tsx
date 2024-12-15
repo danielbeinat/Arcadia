@@ -69,6 +69,7 @@ export const Contact: React.FC = () => {
                       type="text"
                       placeholder="Nombre"
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 bg-white/50 backdrop-blur-sm"
+                      required
                     />
                   </motion.div>
                   <motion.div variants={itemVariants}>
@@ -76,6 +77,7 @@ export const Contact: React.FC = () => {
                       type="text"
                       placeholder="Apellido"
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 bg-white/50 backdrop-blur-sm"
+                      required
                     />
                   </motion.div>
                 </div>
@@ -85,6 +87,7 @@ export const Contact: React.FC = () => {
                     type="email"
                     placeholder="Correo Electrónico"
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 bg-white/50 backdrop-blur-sm"
+                    required
                   />
                 </motion.div>
 
@@ -93,6 +96,7 @@ export const Contact: React.FC = () => {
                     type="tel"
                     placeholder="Teléfono"
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 bg-white/50 backdrop-blur-sm"
+                    required
                   />
                 </motion.div>
 
@@ -154,7 +158,7 @@ export const Contact: React.FC = () => {
                       ))}
                     </select>
                   </motion.div>
-                  <motion.div variants={itemVariants}>
+                  {/* <motion.div variants={itemVariants}>
                     <select className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 bg-white/50 backdrop-blur-sm text-gray-500">
                       <option value="">Carrera</option>
                       {Array(7)
@@ -165,19 +169,54 @@ export const Contact: React.FC = () => {
                           </option>
                         ))}
                     </select>
+                  </motion.div> */}
+                  <motion.div variants={itemVariants}>
+                    <select className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 bg-white/50 backdrop-blur-sm text-gray-500">
+                      <option value="">Carrera</option>
+                      {[
+                        "Ingeniería en Sistemas",
+                        "Licenciatura en Administración",
+                        "Contador Público",
+                        "Diseño Gráfico",
+                        "Medicina",
+                        "Arquitectura",
+                        "Psicología",
+                      ].map((carrera, index) => (
+                        <option
+                          key={index}
+                          value={carrera.toLowerCase().replace(/\s+/g, "-")}
+                        >
+                          {carrera}
+                        </option>
+                      ))}
+                    </select>
                   </motion.div>
                 </div>
 
-                <motion.div variants={itemVariants}>
+                {/* <motion.div variants={itemVariants}>
                   <select className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 bg-white/50 backdrop-blur-sm text-gray-500">
                     <option value="">Modalidad</option>
                     {Array(7)
                       .fill("Undefined")
                       .map((_, index) => (
-                        <option key={index} value={`option-${index}`}>
-                          Undefined
-                        </option>
+                        <option key={index} value={`option-${index}`}></option>
                       ))}
+                  </select>
+                </motion.div> */}
+                <motion.div variants={itemVariants}>
+                  <select className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 bg-white/50 backdrop-blur-sm text-gray-500">
+                    <option value="">Modalidad</option>
+                    {[
+                      "Presencial",
+                      "Virtual",
+                      "Híbrido",
+                      "Asincrónica",
+                      "Mixta",
+                    ].map((modalidad, index) => (
+                      <option key={index} value={modalidad.toLowerCase()}>
+                        {modalidad}
+                      </option>
+                    ))}
                   </select>
                 </motion.div>
 
