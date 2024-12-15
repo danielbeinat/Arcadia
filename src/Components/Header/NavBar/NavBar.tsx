@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
 import logo from "../../../assets/AllDegrees/Images/Logo.png";
 import { Link } from "react-router-dom";
@@ -44,6 +44,7 @@ const navigationLinks: LinkItem[] = [
 export const NavBar = () => {
   const [isShow, setIsShow] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState<number | null>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const handleSubmenuToggle = (index: number) => {
     setOpenSubmenu(openSubmenu === index ? null : index);
@@ -55,8 +56,20 @@ export const NavBar = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <div className=" bg-gray-50">
+    <div
+      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+        isScrolled ? "bg-white shadow-md" : "bg-gray-50"
+      }`}
+    >
       <div className="sticky top-0 z-40 w-full backdrop-blur-lg bg-white/80 border-b border-gray-100">
         <div className="flex items-center justify-between py-4 px-6 lg:px-10 gap-8 max-w-7xl mx-auto">
           {/* Logo */}
