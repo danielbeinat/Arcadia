@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
 import logo from "../../../assets/AllDegrees/Images/Logo.png";
+import { Link } from "react-router-dom";
 
 interface Sublink {
   name: string;
@@ -59,8 +60,8 @@ export const NavBar = () => {
       <div className="sticky top-0 z-40 w-full backdrop-blur-lg bg-white/80 border-b border-gray-100">
         <div className="flex items-center justify-between py-4 px-6 lg:px-10 gap-8 max-w-7xl mx-auto">
           {/* Logo */}
-          <a
-            href="/"
+          <Link
+            to="/"
             className="flex items-center gap-3"
             onClick={() => {
               setIsShow(false);
@@ -68,7 +69,7 @@ export const NavBar = () => {
             }}
           >
             <img className="w-[150px] h-[50px]" src={logo} alt="" />
-          </a>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:block flex-1">
@@ -80,12 +81,12 @@ export const NavBar = () => {
                     onClick={() => handleSubmenuToggle(index)}
                   >
                     {link.to ? (
-                      <a
-                        href={link.to}
+                      <Link
+                        to={link.to}
                         className="text-gray-700 hover:text-indigo-600 font-medium transition-all duration-200 ease-in-out"
                       >
                         {link.name}
-                      </a>
+                      </Link>
                     ) : (
                       <span className="text-gray-700 hover:text-indigo-600 font-medium transition-all duration-200 ease-in-out">
                         {link.name}
@@ -99,13 +100,13 @@ export const NavBar = () => {
                     <ul className="absolute bg-white z-10 w-48 mt-2 py-1 rounded-xl shadow-lg ring-1 ring-black ring-opacity-5 transform opacity-100 scale-100 transition-all duration-200 ease-in-out">
                       {link.sublinks.map((sublink) => (
                         <li key={sublink.name}>
-                          <a
-                            href={sublink.to}
+                          <Link
+                            to={sublink.to}
                             onClick={handleLinkClick}
                             className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-all duration-200 ease-in-out"
                           >
                             {sublink.name}
-                          </a>
+                          </Link>
                         </li>
                       ))}
                     </ul>
@@ -116,12 +117,12 @@ export const NavBar = () => {
           </nav>
 
           {/* Desktop Inscription Button */}
-          <a
-            href="/inscripciones"
+          <Link
+            to="/inscripciones"
             className="hidden md:block text-sm font-medium bg-gradient-to-r from-indigo-600 to-indigo-500 text-white rounded-xl px-5 py-2.5 hover:from-indigo-500 hover:to-indigo-600 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
           >
             Inscripciones
-          </a>
+          </Link>
 
           {/* Mobile Menu Button */}
           <button
@@ -144,13 +145,13 @@ export const NavBar = () => {
                           onClick={() => handleSubmenuToggle(index)}
                         >
                           {link.to ? (
-                            <a
-                              href={link.to}
+                            <Link
+                              to={link.to}
                               onClick={handleLinkClick}
                               className="text-lg text-gray-700 hover:text-indigo-600 font-medium transition-all duration-200"
                             >
                               {link.name}
-                            </a>
+                            </Link>
                           ) : (
                             <span className="text-lg text-gray-700 font-medium">
                               {link.name}
@@ -170,13 +171,13 @@ export const NavBar = () => {
                           <ul className="mt-2 ml-4 space-y-2">
                             {link.sublinks.map((sublink) => (
                               <li key={sublink.name}>
-                                <a
-                                  href={sublink.to}
+                                <Link
+                                  to={sublink.to}
                                   onClick={handleLinkClick}
                                   className="block text-gray-600 hover:text-indigo-600 transition-all duration-200"
                                 >
                                   {sublink.name}
-                                </a>
+                                </Link>
                               </li>
                             ))}
                           </ul>
@@ -185,13 +186,13 @@ export const NavBar = () => {
                     ))}
                   </ul>
                   <div className="py-4 border-t border-gray-100">
-                    <a
-                      href="/inscripciones"
+                    <Link
+                      to="/inscripciones"
                       onClick={handleLinkClick}
                       className="block w-full text-center text-white bg-gradient-to-r from-indigo-600 to-indigo-500 rounded-xl px-4 py-3 font-medium hover:from-indigo-500 hover:to-indigo-600 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                     >
                       Inscripciones
-                    </a>
+                    </Link>
                   </div>
                 </nav>
               </div>
