@@ -2,11 +2,11 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Clock, MapPin, GraduationCap, Calendar } from "lucide-react";
-import { AllDegrees } from "../../assets/AllDegrees/AllDegrees";
+import { NormalizedDegrees } from "../../assets/AllDegrees/AllDegrees";
 
 export const DisplayDegree: React.FC = () => {
   const { careerId } = useParams();
-  const career = AllDegrees.find((item) => item.id === Number(careerId));
+  const career = NormalizedDegrees.find((item) => item.id === Number(careerId));
 
   if (!career) {
     return (
@@ -71,7 +71,7 @@ export const DisplayDegree: React.FC = () => {
             transition={{ delay: 0.6, duration: 0.5 }}
             className="bg-gray-50 rounded-lg shadow-lg p-8 flex-1"
           >
-            {(career.Type === "presencial" || career.Type === "virtual") && (
+            {(career.type === "presencial" || career.type === "virtual") && (
               <div className="mb-6">
                 <h3 className="flex items-center text-xl font-semibold text-gray-800 mb-2">
                   <GraduationCap className="mr-2" />
@@ -94,7 +94,7 @@ export const DisplayDegree: React.FC = () => {
                   <MapPin className="mr-2" />
                   Modalidad
                 </h3>
-                <p className="text-gray-600">{career.Type}</p>
+                <p className="text-gray-600">{career.type}</p>
               </div>
             </div>
 
@@ -103,7 +103,7 @@ export const DisplayDegree: React.FC = () => {
                 <Clock className="mr-2" />
                 Horarios
               </h3>
-              <p className="text-gray-600">{career.Time}</p>
+              <p className="text-gray-600">{career.time}</p>
             </div>
           </motion.div>
 

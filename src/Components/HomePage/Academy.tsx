@@ -65,7 +65,7 @@ export const Academy: React.FC = () => {
           initial="hidden"
           animate="show"
         >
-          {academicAreas.map((area, index) => (
+          {academicAreas.map((area) => (
             <motion.div
               key={area.name}
               variants={{

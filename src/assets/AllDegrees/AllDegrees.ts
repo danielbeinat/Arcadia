@@ -1,17 +1,6 @@
-interface Degrees {
-  id: number;
-  image: string;
-  name: string;
-  Type: string;
-  duration: string;
-  program: string;
-  title?: string;
-  degree?: string;
-  category: string;
-  Time: string;
-}
+import type { Degree, RawDegree } from "../../types/Degree";
 
-export const AllDegrees: Degrees[] = [
+export const AllDegrees: RawDegree[] = [
   {
     id: 1,
     image:
@@ -318,3 +307,23 @@ export const AllDegrees: Degrees[] = [
     Time: " lunes, miércoles y viernes de 18:00 a 20:30.",
   },
 ];
+
+export const NormalizedDegrees: Degree[] = AllDegrees.map((item) => {
+  const normalizedCategory = (() => {
+    const cat = item.category.trim().toLowerCase().replace(/\s+/g, "-");
+    if (cat === "economiacas" || cat === "economias") return "economicas";
+    return cat;
+  })();
+  return {
+    id: item.id,
+    image: item.image,
+    name: item.name,
+    type: item.Type,
+    duration: item.duration,
+    program: item.program,
+    title: item.title,
+    degree: item.degree,
+    category: normalizedCategory,
+    time: item.Time,
+  };
+});

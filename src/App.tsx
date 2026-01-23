@@ -1,46 +1,157 @@
 import { NavBar } from "./Components/Header/NavBar/NavBar";
 import { Route, Routes } from "react-router-dom";
-import { Home } from "./pages/Home/Home";
-import { About } from "./pages/About/About";
-import { Courses } from "./pages/Courses/Courses";
-import { OnCampus } from "./pages/Degrees/OnCampus";
-import { Online } from "./pages/Degrees/Online";
-import { Portal } from "./pages/Students/Portal";
-import { Services } from "./pages/Students/Services";
-import { Info } from "./pages/NewStudents/Info";
-import { Requirements } from "./pages/NewStudents/Requirements";
+import { lazy, Suspense } from "react";
 import { ChatBox } from "./Components/ChatBox/ChatBox";
 import { Footer } from "./Components/Footer/Footer";
-import { Login } from "./pages/Count/Login";
-import { Inscription } from "./pages/Inscription/Inscription";
-import { Category } from "./Components/Category/Category";
-import { Register } from "./pages/Count/Register";
-import { DisplayDegree } from "./Components/DisplayDegree/DisplayDegree";
+import { NotFound } from "./pages/NotFound/NotFound";
+import { NotificationProvider } from "./Components/Notifications/NotificationSystem";
+import { AuthProvider } from "./hooks/useAuth";
+import { offlineManager } from "./utils/offlineManager";
+import { useEffect } from "react";
+
+import { ProtectedRoute } from "./Components/Auth/ProtectedRoute";
+
+const Home = lazy(() =>
+  import("./pages/Home/Home").then((m) => ({ default: m.Home })),
+);
+const About = lazy(() =>
+  import("./pages/About/About").then((m) => ({ default: m.About })),
+);
+const Courses = lazy(() =>
+  import("./pages/Courses/Courses").then((m) => ({ default: m.Courses })),
+);
+const OnCampus = lazy(() =>
+  import("./pages/Degrees/OnCampus").then((m) => ({ default: m.OnCampus })),
+);
+const Online = lazy(() =>
+  import("./pages/Degrees/Online").then((m) => ({ default: m.Online })),
+);
+const Portal = lazy(() =>
+  import("./pages/Students/Portal").then((m) => ({ default: m.Portal })),
+);
+const Dashboard = lazy(() =>
+  import("./pages/Students/Dashboard").then((m) => ({ default: m.Dashboard })),
+);
+const Services = lazy(() =>
+  import("./pages/Students/Services").then((m) => ({ default: m.Services })),
+);
+const Info = lazy(() =>
+  import("./pages/NewStudents/Info").then((m) => ({ default: m.Info })),
+);
+const Requirements = lazy(() =>
+  import("./pages/NewStudents/Requirements").then((m) => ({
+    default: m.Requirements,
+  })),
+);
+const Login = lazy(() =>
+  import("./pages/Count/Login").then((m) => ({ default: m.Login })),
+);
+const Inscription = lazy(() =>
+  import("./pages/Inscription/Inscription").then((m) => ({
+    default: m.Inscription,
+  })),
+);
+const Category = lazy(() =>
+  import("./Components/Category/Category").then((m) => ({
+    default: m.Category,
+  })),
+);
+const Register = lazy(() =>
+  import("./pages/Count/Register").then((m) => ({ default: m.Register })),
+);
+const DisplayDegree = lazy(() =>
+  import("./Components/DisplayDegree/DisplayDegree").then((m) => ({
+    default: m.DisplayDegree,
+  })),
+);
+const Events = lazy(() =>
+  import("./pages/Events/Events").then((m) => ({ default: m.Events })),
+);
+const Unauthorized = lazy(() =>
+  import("./pages/Unauthorized/Unauthorized").then((m) => ({
+    default: m.Unauthorized,
+  })),
+);
 
 export const App: React.FC = () => {
+  useEffect(() => {
+    // Initialize offline functionality
+    offlineManager.setupNetworkListeners((status) => {
+      console.log("Network status changed:", status);
+      if (status === "online") {
+        offlineManager.syncWhenOnline();
+      }
+    });
+
+    // Cache initial data
+    import("./assets/AllDegrees/AllDegrees").then(({ NormalizedDegrees }) => {
+      offlineManager.cacheCourseData(NormalizedDegrees);
+    });
+
+    // Request notification permission
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+  }, []);
+
   return (
-    <>
-      <NavBar />
+    <AuthProvider>
+      <NotificationProvider>
+        <NavBar />
 
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/info" element={<Info />} />
-        <Route path="/requisitos" element={<Requirements />} />
-        <Route path="/online" element={<Online />} />
-        <Route path="/presenciales" element={<OnCampus />} />
-        <Route path="/portal" element={<Portal />} />
-        <Route path="/servicios" element={<Services />} />
-        <Route path="/cursos" element={<Courses />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/inscripciones" element={<Inscription />} />
-        <Route path="/area/:category" element={<Category />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/career/:careerId" element={<DisplayDegree />} />
-      </Routes>
+        <Suspense
+          fallback={
+            <div className="flex items-center justify-center h-[50vh] text-gray-600">
+              Cargando...
+            </div>
+          }
+        >
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/info" element={<Info />} />
+            <Route path="/requisitos" element={<Requirements />} />
+            <Route path="/online" element={<Online />} />
+            <Route path="/presenciales" element={<OnCampus />} />
+            <Route
+              path="/portal"
+              element={
+                <ProtectedRoute>
+                  <Portal />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute allowedRoles={["admin", "professor"]}>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/servicios"
+              element={
+                <ProtectedRoute>
+                  <Services />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/cursos" element={<Courses />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/inscripciones" element={<Inscription />} />
+            <Route path="/area/:category" element={<Category />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/career/:careerId" element={<DisplayDegree />} />
+            <Route path="/eventos" element={<Events />} />
+            <Route path="/unauthorized" element={<Unauthorized />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
 
-      <Footer />
-      <ChatBox />
-    </>
+        <Footer />
+        <ChatBox />
+      </NotificationProvider>
+    </AuthProvider>
   );
 };

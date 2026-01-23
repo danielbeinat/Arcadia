@@ -1,0 +1,21 @@
+{
+  "name": "AcademiaNova - Universidad",
+  "short_name": "AcademiaNova",
+  "description": "Plataforma educativa moderna con cursos y programas universitarios",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#667eea",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "es",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

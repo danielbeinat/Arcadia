@@ -1,7 +1,28 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { FiMail, FiLock, FiLogIn } from "react-icons/fi";
+import { useAuth } from "../../hooks/useAuth";
 
 export const Login: React.FC = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { login, isLoading } = useAuth();
+  const navigate = useNavigate();
+
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    const success = await login(email, password);
+    if (success) {
+      navigate("/portal");
+    } else {
+      setError("Email o contraseña incorrectos.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -16,7 +37,13 @@ export const Login: React.FC = () => {
             <p className="text-gray-500 mt-2">Ingresa a tu cuenta</p>
           </div>
 
-          <form className="space-y-6" action="#" method="POST">
+          {error && (
+            <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm border border-red-100 text-center">
+              {error}
+            </div>
+          )}
+
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="space-y-2">
               <label
                 htmlFor="email"
@@ -31,6 +58,8 @@ export const Login: React.FC = () => {
                 type="email"
                 autoComplete="email"
                 required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-indigo-500 transition-colors duration-200 bg-gray-50 focus:bg-white outline-none"
                 placeholder="tu@email.com"
               />
@@ -58,6 +87,8 @@ export const Login: React.FC = () => {
                 type="password"
                 autoComplete="current-password"
                 required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-indigo-500 transition-colors duration-200 bg-gray-50 focus:bg-white outline-none"
                 placeholder="••••••••"
               />
@@ -65,10 +96,20 @@ export const Login: React.FC = () => {
 
             <button
               type="submit"
-              className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-200 flex items-center justify-center gap-2"
+              disabled={isLoading}
+              className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <FiLogIn className="w-5 h-5" />
-              Iniciar Sesión
+              {isLoading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Iniciando sesión...
+                </>
+              ) : (
+                <>
+                  <FiLogIn className="w-5 h-5" />
+                  Iniciar Sesión
+                </>
+              )}
             </button>
           </form>
 

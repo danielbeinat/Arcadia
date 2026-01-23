@@ -2,20 +2,8 @@ import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Calendar, UserCheck, GraduationCap, Flag } from "lucide-react";
-import { AllDegrees } from "../../assets/AllDegrees/AllDegrees";
-
-interface Degree {
-  id: number;
-  image: string;
-  name: string;
-  Type: string;
-  duration: string;
-  program: string;
-  title?: string;
-  degree?: string;
-  category: string;
-  Time: string;
-}
+import { NormalizedDegrees } from "../../assets/AllDegrees/AllDegrees";
+import type { Degree } from "../../types/Degree";
 
 export const Category: React.FC = () => {
   const { category } = useParams<{ category: string }>();
@@ -26,7 +14,9 @@ export const Category: React.FC = () => {
     navigate(`/career/${id}`);
   };
 
-  const degrees = AllDegrees.filter((item) => item.category === category);
+  const degrees = NormalizedDegrees.filter(
+    (item) => item.category === category,
+  );
 
   return (
     <div className="bg-gray-100 min-h-screen pb-20">
@@ -73,7 +63,7 @@ export const Category: React.FC = () => {
                     label="Programa"
                     value={item.program}
                   />
-                  {(item.Type === "presencial" || item.Type === "virtual") && (
+                  {(item.type === "presencial" || item.type === "virtual") && (
                     <>
                       <InfoItem
                         icon={<Flag className="w-5 h-5" />}

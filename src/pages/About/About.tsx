@@ -10,11 +10,6 @@ export const About: React.FC = () => {
     },
   };
 
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { y: 0, opacity: 1 },
-  };
-
   const values = [
     {
       title: "Excelencia académica",
