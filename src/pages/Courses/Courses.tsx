@@ -1,7 +1,4 @@
-import cursos from "../../assets/AllDegrees/Images/cursos.webp";
 import { NormalizedDegrees } from "../../assets/AllDegrees/AllDegrees";
-import { MdCalendarMonth } from "react-icons/md";
-import { FaUserGraduate } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useState, useMemo, useEffect } from "react";
@@ -10,6 +7,7 @@ import { useNotifications } from "../../Components/Notifications/NotificationSys
 import { useDebounce } from "../../hooks/useDebounce";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { offlineManager } from "../../utils/offlineManager";
+import { DegreeCard } from "../../Components/DegreeCard/DegreeCard";
 
 import type { Degree } from "../../types/Degree";
 
@@ -143,14 +141,119 @@ export const Courses: React.FC = () => {
   return (
     <>
       <div className="mb-20">
-        <motion.div
-          initial={{ opacity: 0, y: -50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="w-full "
-        >
-          <img className="" src={cursos} alt="image" />
-        </motion.div>
+        {/* Banner SVG como cabecera principal */}
+        <div className="max-w-7xl mx-auto px-4 pt-12">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <svg
+              width="100%"
+              height="100%"
+              viewBox="0 0 1200 320"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="rounded-3xl shadow-2xl overflow-hidden"
+            >
+              {/* Background */}
+              <rect width="1200" height="320" rx="24" fill="white" />
+
+              {/* Left Gradient Shape */}
+              <defs>
+                <linearGradient
+                  id="violetGradientCourses"
+                  x1="0"
+                  y1="0"
+                  x2="1"
+                  y2="1"
+                >
+                  <stop offset="0%" stopColor="#6D28D9" />
+                  <stop offset="100%" stopColor="#7C3AED" />
+                </linearGradient>
+              </defs>
+
+              <path
+                d="M0 0H340C260 80 260 240 340 320H0V0Z"
+                fill="url(#violetGradientCourses)"
+              />
+
+              {/* Glass Icon Background */}
+              <rect
+                x="110"
+                y="110"
+                width="100"
+                height="100"
+                rx="20"
+                fill="white"
+                fillOpacity="0.15"
+              />
+
+              {/* Course/Book Icon */}
+              <path
+                d="M135 145H185V185H135V145Z"
+                stroke="white"
+                strokeWidth="3"
+                fill="none"
+              />
+              <line
+                x1="135"
+                y1="155"
+                x2="185"
+                y2="155"
+                stroke="white"
+                strokeWidth="2"
+              />
+              <line
+                x1="135"
+                y1="165"
+                x2="185"
+                y2="165"
+                stroke="white"
+                strokeWidth="2"
+              />
+              <line
+                x1="135"
+                y1="175"
+                x2="165"
+                y2="175"
+                stroke="white"
+                strokeWidth="2"
+              />
+
+              {/* Text */}
+              <text
+                x="420"
+                y="140"
+                fill="#6D28D9"
+                fontSize="36"
+                fontWeight="800"
+                fontFamily="Arial, Helvetica, sans-serif"
+              >
+                NUESTROS
+              </text>
+              <text
+                x="420"
+                y="185"
+                fill="#6D28D9"
+                fontSize="36"
+                fontWeight="800"
+                fontFamily="Arial, Helvetica, sans-serif"
+              >
+                CURSOS
+              </text>
+              <text
+                x="420"
+                y="225"
+                fill="#555555"
+                fontSize="18"
+                fontFamily="Arial, Helvetica, sans-serif"
+              >
+                Especialízate con los mejores expertos
+              </text>
+            </svg>
+          </motion.div>
+        </div>
 
         {/* Barra de búsqueda y filtros */}
         <div className="max-w-7xl mx-auto px-4 mt-8">
@@ -287,47 +390,8 @@ export const Courses: React.FC = () => {
         {/* Grid de cursos */}
         <div className="grid grid-cols-1 px-4 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredCourses.length > 0 ? (
-            filteredCourses.map((item: Degree) => (
-              <motion.article
-                key={item.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                whileHover={{ scale: 1.03 }}
-                className="bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer"
-                onClick={() => handleCardClick(item.id)}
-              >
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-6">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">
-                    {item.name}
-                  </h2>
-                  <div className="space-y-3">
-                    <div className="flex items-center text-gray-700">
-                      <div className="bg-indigo-100 rounded-full p-2 mr-3">
-                        <MdCalendarMonth className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <span className="font-semibold">Duración:</span>{" "}
-                        {item.duration}
-                      </div>
-                    </div>
-                    <div className="flex items-center text-gray-700">
-                      <div className="bg-indigo-100 rounded-full p-2 mr-3">
-                        <FaUserGraduate className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <span className="font-semibold">Programa:</span>{" "}
-                        {item.program}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </motion.article>
+            filteredCourses.map((item) => (
+              <DegreeCard key={item.id} item={item} onClick={handleCardClick} />
             ))
           ) : (
             <motion.div

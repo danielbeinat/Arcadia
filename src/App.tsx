@@ -75,7 +75,6 @@ const Unauthorized = lazy(() =>
 
 export const App: React.FC = () => {
   useEffect(() => {
-    // Initialize offline functionality
     offlineManager.setupNetworkListeners((status) => {
       console.log("Network status changed:", status);
       if (status === "online") {
@@ -83,20 +82,18 @@ export const App: React.FC = () => {
       }
     });
 
-    // Cache initial data
     import("./assets/AllDegrees/AllDegrees").then(({ NormalizedDegrees }) => {
       offlineManager.cacheCourseData(NormalizedDegrees);
     });
 
-    // Request notification permission
     if ("Notification" in window && Notification.permission === "default") {
       Notification.requestPermission();
     }
   }, []);
 
   return (
-    <AuthProvider>
-      <NotificationProvider>
+    <NotificationProvider>
+      <AuthProvider>
         <NavBar />
 
         <Suspense
@@ -151,7 +148,7 @@ export const App: React.FC = () => {
 
         <Footer />
         <ChatBox />
-      </NotificationProvider>
-    </AuthProvider>
+      </AuthProvider>
+    </NotificationProvider>
   );
 };

@@ -6,6 +6,7 @@ import React, {
   useState,
 } from "react";
 import type { AuthState, User, RegisterData } from "../types/User";
+import { useNotifications } from "../Components/Notifications/NotificationSystem";
 
 interface AuthContextValue extends Omit<AuthState, "isLoading"> {
   isLoading: boolean;
@@ -24,6 +25,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { addNotification } = useNotifications();
 
   // Inicializar usuarios por defecto si no existen
   useEffect(() => {
@@ -87,6 +89,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       );
 
       if (!foundUser) {
+        addNotification({
+          type: "error",
+          title: "Error de acceso",
+          message: "Email o contraseña incorrectos",
+        });
         return false;
       }
 
@@ -94,6 +101,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const { password: _, ...userWithoutPassword } = foundUser;
       localStorage.setItem(STORAGE_KEY, JSON.stringify(userWithoutPassword));
       setUser(userWithoutPassword as User);
+
+      addNotification({
+        type: "success",
+        title: "¡Bienvenido!",
+        message: `Hola de nuevo, ${foundUser.name}`,
+      });
       return true;
     } finally {
       setIsLoading(false);
@@ -109,6 +122,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         : [];
 
       if (users.some((u) => u.email === data.email)) {
+        addNotification({
+          type: "error",
+          title: "Error de registro",
+          message: "El correo electrónico ya está registrado",
+        });
         throw new Error("El usuario ya existe");
       }
 
@@ -144,6 +162,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const { password: _, ...userWithoutPassword } = newUser;
       localStorage.setItem(STORAGE_KEY, JSON.stringify(userWithoutPassword));
       setUser(userWithoutPassword as User);
+
+      addNotification({
+        type: "success",
+        title: "¡Cuenta creada!",
+        message: "Te has registrado exitosamente en AcademiaNova",
+      });
 
       return true;
     } finally {

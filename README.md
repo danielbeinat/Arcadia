@@ -19,17 +19,7 @@ AcademiaNova es una moderna plataforma de gestión universitaria desarrollada co
 - **Iconos**: React Icons (Fi, Lu).
 - **Estado**: React Context API para autenticación y notificaciones.
 
-## 📁 Estructura del Proyecto
 
-```text
-src/
-├── Components/     # Componentes reutilizables (Auth, Header, Footer, etc.)
-├── hooks/          # Hooks personalizados (useAuth, useEvents, etc.)
-├── pages/          # Vistas principales (Home, Portal, Dashboard, Login)
-├── types/          # Definiciones de interfaces TypeScript
-├── utils/          # Utilidades (Gestión offline, validaciones)
-└── assets/         # Recursos estáticos (Imágenes, datos de carreras)
-```
 
 ## ⚙️ Instalación y Uso
 
@@ -53,17 +43,3 @@ src/
    npm run build
    ```
 
-## 🔑 Credenciales de Prueba
-
-El sistema incluye usuarios predefinidos para facilitar las pruebas:
-
-| Rol | Email | Contraseña |
-| :--- | :--- | :--- |
-| **Administrador** | `admin@universidad.com` | `admin` |
-| **Profesor** | `prof@universidad.com` | `prof` |
-
-*También puedes registrar nuevos usuarios directamente desde la página de Registro.*
-
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT.

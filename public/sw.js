@@ -19,6 +19,14 @@ self.addEventListener('install', (event) => {
 
 // Fetch event - serve from cache when offline
 self.addEventListener('fetch', (event) => {
+    // Skip external requests (like freepik.com images) to avoid CORS issues
+    if (event.request.url.startsWith('http')) {
+        const url = new URL(event.request.url);
+        if (url.hostname !== location.hostname) {
+            return; // Let external requests be handled normally
+        }
+    }
+
     event.respondWith(
         caches.match(event.request)
             .then((response) => {
@@ -32,7 +40,7 @@ self.addEventListener('fetch', (event) => {
 
                 return fetch(fetchRequest).then(
                     (response) => {
-                        // Check if valid response
+                        // Check if valid response and from same origin
                         if (!response || response.status !== 200 || response.type !== 'basic') {
                             return response;
                         }

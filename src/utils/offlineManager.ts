@@ -54,10 +54,24 @@ class OfflineManager {
 
       localStorage.setItem(this.OFFLINE_DATA_KEY, JSON.stringify(offlineData));
 
-      // Cache images
+      // Cache only local images (skip external ones like freepik.com)
       const cache = await caches.open(this.CACHE_NAME);
-      const imageUrls = courses.map((course) => course.image).filter(Boolean);
-      await cache.addAll(imageUrls);
+      const imageUrls = courses
+        .map((course) => course.image)
+        .filter(Boolean)
+        .filter((url: string) => {
+          // Only cache same-origin images to avoid CORS issues
+          try {
+            const urlObj = new URL(url);
+            return urlObj.hostname === window.location.hostname;
+          } catch {
+            return false;
+          }
+        });
+
+      if (imageUrls.length > 0) {
+        await cache.addAll(imageUrls);
+      }
 
       console.log("Course data cached successfully");
     } catch (error) {
