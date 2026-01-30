@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import type { AuthState, User, RegisterData } from "../types/User";
 import { useNotifications } from "../Components/Notifications/NotificationSystem";
-import { apiClient } from "../services/api";
+import { api } from "../services/api";
 
 interface AuthContextValue extends Omit<AuthState, "isLoading"> {
   isLoading: boolean;
@@ -31,11 +31,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         const token = localStorage.getItem("auth-token");
         if (token) {
-          const userProfile = await apiClient.getProfile();
+          const userProfile = await api.getProfile();
           setUser(userProfile);
         }
       } catch (error) {
-        apiClient.clearToken();
+        api.clearToken();
         console.error("Failed to initialize auth:", error);
       } finally {
         setIsLoading(false);
@@ -48,7 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     try {
-      const response = await apiClient.login(email, password);
+      const response = await api.login(email, password);
       setUser(response.user);
       addNotification({
         type: "success",
@@ -71,7 +71,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const register = async (data: RegisterData): Promise<boolean> => {
     setIsLoading(true);
     try {
-      const response = await apiClient.register(data);
+      const response = await api.register(data);
       setUser(response.user);
       addNotification({
         type: "success",
@@ -93,7 +93,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const logout = async () => {
     try {
-      await apiClient.logout();
+      await api.logout();
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
@@ -109,7 +109,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const updateProfile = async (data: Partial<User>): Promise<boolean> => {
     setIsLoading(true);
     try {
-      const updatedUser = await apiClient.updateProfile(data);
+      const updatedUser = await api.updateProfile(data);
       setUser(updatedUser);
       addNotification({
         type: "success",

@@ -30,6 +30,17 @@ export interface User {
   program: string;
   semester?: number;
   avatar?: string;
+  dniUrl?: string;
+  degreeUrl?: string;
+  country?: string;
+  docType?: string;
+  docNumber?: string;
+  nationality?: string;
+  phonePrefix?: string;
+  phoneNumber?: string;
+  degree?: string;
+  programType?: string;
+  startPeriod?: string;
   enrollmentDate: Date;
   status: UserStatus;
   gpa?: number;
@@ -102,6 +113,17 @@ export interface RegisterRequest {
   password: string;
   role: UserRole;
   program?: string;
+  dniUrl?: string;
+  degreeUrl?: string;
+  country?: string;
+  docType?: string;
+  docNumber?: string;
+  nationality?: string;
+  phonePrefix?: string;
+  phoneNumber?: string;
+  degree?: string;
+  programType?: string;
+  startPeriod?: string;
 }
 
 export interface AuthResponse {

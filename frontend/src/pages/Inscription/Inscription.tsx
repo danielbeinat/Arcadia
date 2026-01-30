@@ -15,19 +15,34 @@ import {
   MapPin,
   Loader2,
   AlertCircle,
+  Upload,
+  File,
+  Eye,
+  EyeOff,
+  Lock,
+  CheckCircle,
 } from "lucide-react";
+import { NormalizedDegrees } from "../../assets/AllDegrees/AllDegrees";
+import { useAuth } from "../../hooks/useAuth";
 
 export const Inscription: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, register: authRegister } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [dniFile, setDniFile] = useState<File | null>(null);
+  const [degreeFile, setDegreeFile] = useState<File | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
-    password: "", // Añadido para el registro
+    password: "",
+    confirmPassword: "",
     country: "",
     docType: "",
     docNumber: "",
@@ -42,6 +57,34 @@ export const Inscription: React.FC = () => {
     startPeriod: "",
   });
 
+  const programsByArea = React.useMemo(() => {
+    const areaNames: Record<string, string> = {
+      informatica: "Informática",
+      economicas: "Económicas",
+      ingenieria: "Ingeniería",
+      psicologia: "Psicología",
+      "bellas-artes": "Bellas Artes",
+    };
+
+    return NormalizedDegrees.reduce(
+      (acc, degree) => {
+        const cat = degree.category;
+        const area =
+          areaNames[cat] ||
+          cat.charAt(0).toUpperCase() + cat.slice(1).replace("-", " ");
+
+        if (!acc[area]) {
+          acc[area] = [];
+        }
+        if (!acc[area].includes(degree.name)) {
+          acc[area].push(degree.name);
+        }
+        return acc;
+      },
+      {} as Record<string, string[]>,
+    );
+  }, []);
+
   useEffect(() => {
     if (location.state) {
       const { degree, program, programType } = location.state as {
@@ -50,9 +93,24 @@ export const Inscription: React.FC = () => {
         programType?: string;
       };
 
+      const areaNames: Record<string, string> = {
+        informatica: "Informática",
+        economicas: "Económicas",
+        ingenieria: "Ingeniería",
+        psicologia: "Psicología",
+        "bellas-artes": "Bellas Artes",
+      };
+
+      const normalizedDegree = degree?.toLowerCase().replace(/\s+/g, "-") || "";
+      const displayDegree =
+        areaNames[normalizedDegree] ||
+        (degree
+          ? degree.charAt(0).toUpperCase() + degree.slice(1).replace("-", " ")
+          : "");
+
       setFormData((prev) => ({
         ...prev,
-        degree: degree || prev.degree,
+        degree: displayDegree || prev.degree,
         program: program || prev.program,
         programType: programType || prev.programType,
       }));
@@ -69,46 +127,160 @@ export const Inscription: React.FC = () => {
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
+    if (error) setError(null);
+
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleFileChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    type: "dni" | "degree",
+  ) => {
+    const file = e.target.files?.[0] || null;
+
+    if (file && file.size > 5 * 1024 * 1024) {
+      setError(
+        `El archivo ${type === "dni" ? "del DNI" : "del título"} es demasiado grande. El máximo permitido es 5MB.`,
+      );
+      e.target.value = "";
+      return;
+    }
+
+    if (type === "dni") {
+      setDniFile(file);
+    } else {
+      setDegreeFile(file);
+    }
+  };
+
+  const handleNextStep = (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+
+    if (currentStep === 1) {
+      const requiredFields = [
+        "firstName",
+        "lastName",
+        "email",
+        "password",
+        "confirmPassword",
+        "country",
+        "docType",
+        "docNumber",
+        "nationality",
+        "phonePrefix",
+        "phoneNumber",
+      ];
+
+      const emptyFields = requiredFields.filter(
+        (field) => !formData[field as keyof typeof formData],
+      );
+      if (emptyFields.length > 0) {
+        setError("Por favor completa todos los campos obligatorios.");
+        return;
+      }
+
+      const allowedDomains = ["gmail.com", "outlook.com", "hotmail.com"];
+      const emailDomain = formData.email.split("@")[1]?.toLowerCase();
+      if (!allowedDomains.includes(emailDomain)) {
+        setError(
+          "El correo debe ser una dirección de Gmail, Outlook o Hotmail.",
+        );
+        return;
+      }
+
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+      if (!passwordRegex.test(formData.password)) {
+        setError(
+          "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.",
+        );
+        return;
+      }
+
+      if (formData.password !== formData.confirmPassword) {
+        setError("Las contraseñas no coinciden.");
+        return;
+      }
+
+      if (formData.docType === "DNI" && !/^\d{8}$/.test(formData.docNumber)) {
+        setError("El número de DNI debe ser de exactamente 8 dígitos.");
+        return;
+      }
+    }
+
+    if (currentStep < 3) {
+      setCompletedSteps((prev) => [...new Set([...prev, currentStep])]);
+      setCurrentStep((prev) => prev + 1);
+      window.scrollTo(0, 0);
+    } else {
+      handleSubmit(e);
+    }
+  };
+
+  const handlePrevStep = () => {
+    setError(null);
+    if (currentStep > 1) {
+      setCurrentStep((prev) => prev - 1);
+      window.scrollTo(0, 0);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    if (e) e.preventDefault();
     setIsSubmitting(true);
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:3001/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password || "Password123!", // Password por defecto o el que el usuario elija
-          name: formData.firstName,
-          lastName: formData.lastName,
-          role: "STUDENT",
-          program: formData.program,
-          semester: 1,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Error al procesar la inscripción");
+      if (!dniFile || !degreeFile) {
+        throw new Error("Por favor sube todos los documentos requeridos.");
       }
 
-      setCurrentStep(4); // Ir al paso de confirmación
+      const formDataToSend = new FormData();
+
+      formDataToSend.append("email", formData.email);
+      formDataToSend.append("password", formData.password);
+      formDataToSend.append("name", formData.firstName);
+      formDataToSend.append("lastName", formData.lastName);
+      formDataToSend.append("role", "STUDENT");
+
+      formDataToSend.append("country", formData.country);
+      formDataToSend.append("docType", formData.docType);
+      formDataToSend.append("docNumber", formData.docNumber);
+      formDataToSend.append("nationality", formData.nationality);
+      formDataToSend.append("phoneType", formData.phoneType);
+      formDataToSend.append("phonePrefix", formData.phonePrefix);
+      formDataToSend.append("phoneArea", formData.phoneArea);
+      formDataToSend.append("phoneNumber", formData.phoneNumber);
+      formDataToSend.append("degree", formData.degree);
+      formDataToSend.append("programType", formData.programType);
+      formDataToSend.append("program", formData.program || "Sin programa");
+      formDataToSend.append("startPeriod", formData.startPeriod);
+
+      if (dniFile) formDataToSend.append("dniUrl", dniFile);
+      if (degreeFile) formDataToSend.append("degreeUrl", degreeFile);
+
+      const success = await authRegister(formDataToSend);
+
+      if (!success) {
+        throw new Error(
+          "No se pudo completar el registro. Por favor intenta de nuevo.",
+        );
+      }
+
+      setCompletedSteps((prev) => [...new Set([...prev, 3])]);
+      setCurrentStep(4);
+      window.scrollTo({ top: 0, behavior: "smooth" });
       setTimeout(() => {
-        navigate("/login");
+        window.scrollTo(0, 0);
+        navigate("/portal");
       }, 5000);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Error al procesar la inscripción";
+      setError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -153,7 +325,9 @@ export const Inscription: React.FC = () => {
             {steps.map((step, index) => {
               const Icon = step.icon;
               const isActive = currentStep === step.number;
-              const isCompleted = currentStep > step.number;
+              const isCompleted =
+                completedSteps.includes(step.number) ||
+                currentStep > step.number;
 
               return (
                 <React.Fragment key={step.number}>
@@ -223,7 +397,39 @@ export const Inscription: React.FC = () => {
 
       {/* Form Content */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-        {error && (
+        {user && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-3xl shadow-xl border border-indigo-100 p-8 md:p-12 text-center mb-12"
+          >
+            <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckCircle className="w-10 h-10 text-indigo-600" />
+            </div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              ¡Ya estás registrado en Arcadia!
+            </h2>
+            <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+              Hola <strong>{user.name}</strong>, detectamos que ya tienes una
+              cuenta activa en nuestra plataforma. No es necesario completar el
+              formulario de inscripción nuevamente.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button
+                onClick={() => {
+                  window.scrollTo(0, 0);
+                  navigate("/portal");
+                }}
+                className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 flex items-center justify-center gap-2"
+              >
+                Ir a mi Portal
+                <ArrowRight size={18} />
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {!user && error && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -234,7 +440,7 @@ export const Inscription: React.FC = () => {
           </motion.div>
         )}
 
-        {currentStep === 4 ? (
+        {!user && currentStep === 4 ? (
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -258,490 +464,759 @@ export const Inscription: React.FC = () => {
                 <span>Redirigiendo al inicio de sesión...</span>
               </div>
               <button
-                onClick={() => navigate("/login")}
+                onClick={() => {
+                  window.scrollTo(0, 0);
+                  navigate("/login");
+                }}
                 className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-colors"
               >
                 Ir al Login ahora
               </button>
             </div>
           </motion.div>
-        ) : (
+        ) : null}
+        {!user && currentStep !== 4 && (
           <motion.form
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             className="space-y-8"
-            onSubmit={handleSubmit}
+            onSubmit={handleNextStep}
           >
-            {/* Datos Personales */}
-            <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-6 md:p-8">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center shadow-lg">
-                  <User size={24} className="text-white" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900">
-                    Datos Personales
-                  </h2>
-                  <p className="text-sm text-gray-500">
-                    Información básica de contacto
-                  </p>
-                </div>
-              </div>
+            {currentStep === 1 && (
+              <>
+                {/* Datos Personales */}
+                <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-6 md:p-8">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center shadow-lg">
+                      <User size={24} className="text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900">
+                        Datos Personales
+                      </h2>
+                      <p className="text-sm text-gray-500">
+                        Información básica de contacto
+                      </p>
+                    </div>
+                  </div>
 
-              <div className="grid md:grid-cols-2 gap-6">
-                {/* Nombre */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">
-                    Nombre/s <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <User
-                      className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                      size={20}
-                    />
-                    <input
-                      type="text"
-                      name="firstName"
-                      value={formData.firstName}
-                      onChange={handleInputChange}
-                      className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all outline-none"
-                      placeholder="Ingresa tu nombre"
-                      required
-                    />
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {/* Nombre */}
+                    <div className="space-y-2">
+                      <label className="block text-sm font-semibold text-gray-700">
+                        Nombre/s <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <User
+                          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                          size={20}
+                        />
+                        <input
+                          type="text"
+                          name="firstName"
+                          value={formData.firstName}
+                          onChange={handleInputChange}
+                          className={`w-full pl-12 pr-4 py-3.5 border-2 rounded-xl focus:ring-4 transition-all outline-none ${
+                            error &&
+                            error.includes("campos obligatorios") &&
+                            !formData.firstName
+                              ? "border-red-300 focus:border-red-500 focus:ring-red-100"
+                              : "border-gray-200 focus:border-indigo-500 focus:ring-indigo-100"
+                          }`}
+                          placeholder="Ingresa tu nombre"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    {/* Apellido */}
+                    <div className="space-y-2">
+                      <label className="block text-sm font-semibold text-gray-700">
+                        Apellido/s <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <User
+                          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                          size={20}
+                        />
+                        <input
+                          type="text"
+                          name="lastName"
+                          value={formData.lastName}
+                          onChange={handleInputChange}
+                          className={`w-full pl-12 pr-4 py-3.5 border-2 rounded-xl focus:ring-4 transition-all outline-none ${
+                            error &&
+                            error.includes("campos obligatorios") &&
+                            !formData.lastName
+                              ? "border-red-300 focus:border-red-500 focus:ring-red-100"
+                              : "border-gray-200 focus:border-indigo-500 focus:ring-indigo-100"
+                          }`}
+                          placeholder="Ingresa tu apellido"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    {/* Email */}
+                    <div className="space-y-2">
+                      <label className="block text-sm font-semibold text-gray-700">
+                        Correo Electrónico{" "}
+                        <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <Mail
+                          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                          size={20}
+                        />
+                        <input
+                          type="email"
+                          name="email"
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          className={`w-full pl-12 pr-4 py-3.5 border-2 rounded-xl focus:ring-4 transition-all outline-none ${
+                            error && error.includes("correo")
+                              ? "border-red-300 focus:border-red-500 focus:ring-red-100"
+                              : "border-gray-200 focus:border-indigo-500 focus:ring-indigo-100"
+                          }`}
+                          placeholder="ejemplo@email.com"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    {/* Password */}
+                    <div className="space-y-2">
+                      <label className="block text-sm font-semibold text-gray-700">
+                        Contraseña <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <Lock
+                          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                          size={20}
+                        />
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          name="password"
+                          value={formData.password}
+                          onChange={handleInputChange}
+                          className={`w-full pl-12 pr-12 py-3.5 border-2 rounded-xl focus:ring-4 transition-all outline-none ${
+                            error && error.includes("contraseña")
+                              ? "border-red-300 focus:border-red-500 focus:ring-red-100"
+                              : "border-gray-200 focus:border-indigo-500 focus:ring-indigo-100"
+                          }`}
+                          placeholder="Crea una contraseña"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-indigo-600 transition-colors focus:outline-none"
+                        >
+                          {showPassword ? (
+                            <EyeOff size={20} />
+                          ) : (
+                            <Eye size={20} />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Confirm Password */}
+                    <div className="space-y-2">
+                      <label className="block text-sm font-semibold text-gray-700">
+                        Confirmar Contraseña{" "}
+                        <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <Lock
+                          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                          size={20}
+                        />
+                        <input
+                          type={showConfirmPassword ? "text" : "password"}
+                          name="confirmPassword"
+                          value={formData.confirmPassword}
+                          onChange={handleInputChange}
+                          className={`w-full pl-12 pr-12 py-3.5 border-2 rounded-xl focus:ring-4 transition-all outline-none ${
+                            error && error.includes("coinciden")
+                              ? "border-red-300 focus:border-red-500 focus:ring-red-100"
+                              : "border-gray-200 focus:border-indigo-500 focus:ring-indigo-100"
+                          }`}
+                          placeholder="Repite tu contraseña"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-indigo-600 transition-colors focus:outline-none"
+                        >
+                          {showConfirmPassword ? (
+                            <EyeOff size={20} />
+                          ) : (
+                            <Eye size={20} />
+                          )}
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                {/* Apellido */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">
-                    Apellido/s <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <User
-                      className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                      size={20}
-                    />
-                    <input
-                      type="text"
-                      name="lastName"
-                      value={formData.lastName}
-                      onChange={handleInputChange}
-                      className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all outline-none"
-                      placeholder="Ingresa tu apellido"
-                      required
-                    />
+                {/* Documento de Identidad */}
+                <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-6 md:p-8">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg">
+                      <CreditCard size={24} className="text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900">
+                        Documento de Identidad
+                      </h2>
+                      <p className="text-sm text-gray-500">
+                        Información de identificación
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-3 gap-6 mb-6">
+                    {/* País Emisor */}
+                    <div className="space-y-2">
+                      <label className="block text-sm font-semibold text-gray-700">
+                        País Emisor <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <Globe
+                          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                          size={20}
+                        />
+                        <select
+                          name="country"
+                          value={formData.country}
+                          onChange={handleInputChange}
+                          className={`w-full pl-12 pr-4 py-3.5 border-2 rounded-xl focus:ring-4 transition-all outline-none appearance-none bg-white ${
+                            error &&
+                            error.includes("obligatorios") &&
+                            !formData.country
+                              ? "border-red-300 focus:border-red-500 focus:ring-red-100"
+                              : "border-gray-200 focus:border-indigo-500 focus:ring-indigo-100"
+                          }`}
+                          required
+                        >
+                          <option value="">Selecciona</option>
+                          <option value="Argentina">🇦🇷 Argentina</option>
+                          <option value="Brasil">🇧🇷 Brasil</option>
+                          <option value="Uruguay">🇺🇾 Uruguay</option>
+                          <option value="Chile">🇨🇱 Chile</option>
+                          <option value="Paraguay">🇵🇾 Paraguay</option>
+                          <option value="Colombia">🇨🇴 Colombia</option>
+                          <option value="Perú">🇵🇪 Perú</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Tipo de Documento */}
+                    <div className="space-y-2">
+                      <label className="block text-sm font-semibold text-gray-700">
+                        Tipo <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <FileText
+                          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                          size={20}
+                        />
+                        <select
+                          name="docType"
+                          value={formData.docType}
+                          onChange={handleInputChange}
+                          className={`w-full pl-12 pr-4 py-3.5 border-2 rounded-xl focus:ring-4 transition-all outline-none appearance-none bg-white ${
+                            error &&
+                            error.includes("obligatorios") &&
+                            !formData.docType
+                              ? "border-red-300 focus:border-red-500 focus:ring-red-100"
+                              : "border-gray-200 focus:border-indigo-500 focus:ring-indigo-100"
+                          }`}
+                          required
+                        >
+                          <option value="">Selecciona</option>
+                          <option value="DNI">DNI</option>
+                          <option value="Pasaporte">Pasaporte</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Número */}
+                    <div className="space-y-2">
+                      <label className="block text-sm font-semibold text-gray-700">
+                        Número <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <FileText
+                          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                          size={20}
+                        />
+                        <input
+                          type="text"
+                          name="docNumber"
+                          value={formData.docNumber}
+                          onChange={handleInputChange}
+                          className={`w-full pl-12 pr-4 py-3.5 border-2 rounded-xl focus:ring-4 transition-all outline-none ${
+                            error &&
+                            (error.includes("DNI") ||
+                              (error.includes("obligatorios") &&
+                                !formData.docNumber))
+                              ? "border-red-300 focus:border-red-500 focus:ring-red-100"
+                              : "border-gray-200 focus:border-indigo-500 focus:ring-indigo-100"
+                          }`}
+                          placeholder="12345678"
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Nacionalidad */}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-semibold text-gray-700">
+                      Nacionalidad <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <MapPin
+                        className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                        size={20}
+                      />
+                      <input
+                        type="text"
+                        name="nationality"
+                        value={formData.nationality}
+                        onChange={handleInputChange}
+                        className={`w-full pl-12 pr-4 py-3.5 border-2 rounded-xl focus:ring-4 transition-all outline-none ${
+                          error &&
+                          error.includes("obligatorios") &&
+                          !formData.nationality
+                            ? "border-red-300 focus:border-red-500 focus:ring-red-100"
+                            : "border-gray-200 focus:border-indigo-500 focus:ring-indigo-100"
+                        }`}
+                        placeholder="Argentina"
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
 
-                {/* Email */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">
-                    Correo Electrónico <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <Mail
-                      className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                      size={20}
-                    />
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all outline-none"
-                      placeholder="ejemplo@email.com"
-                      required
-                    />
+                {/* Teléfono */}
+                <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-6 md:p-8">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg">
+                      <Phone size={24} className="text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900">
+                        Teléfono de Contacto
+                      </h2>
+                      <p className="text-sm text-gray-500">
+                        ¿Cómo podemos comunicarnos contigo?
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="space-y-2">
+                      <label className="block text-sm font-semibold text-gray-700">
+                        Tipo
+                      </label>
+                      <select
+                        name="phoneType"
+                        value={formData.phoneType}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all outline-none bg-white"
+                      >
+                        <option value="movil">📱 Móvil</option>
+                        <option value="fijo">☎️ Fijo</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="block text-sm font-semibold text-gray-700">
+                        Prefijo <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        name="phonePrefix"
+                        value={formData.phonePrefix}
+                        onChange={handleInputChange}
+                        className={`w-full px-4 py-3.5 border-2 rounded-xl focus:ring-4 transition-all outline-none bg-white ${
+                          error &&
+                          error.includes("obligatorios") &&
+                          !formData.phonePrefix
+                            ? "border-red-300 focus:border-red-500 focus:ring-red-100"
+                            : "border-gray-200 focus:border-indigo-500 focus:ring-indigo-100"
+                        }`}
+                        required
+                      >
+                        <option value="">Código</option>
+                        <option value="+54">+54 AR</option>
+                        <option value="+55">+55 BR</option>
+                        <option value="+598">+598 UY</option>
+                        <option value="+56">+56 CL</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="block text-sm font-semibold text-gray-700">
+                        Área
+                      </label>
+                      <input
+                        type="text"
+                        name="phoneArea"
+                        value={formData.phoneArea}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all outline-none"
+                        placeholder="11"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="block text-sm font-semibold text-gray-700">
+                        Número <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="phoneNumber"
+                        value={formData.phoneNumber}
+                        onChange={handleInputChange}
+                        className={`w-full px-4 py-3.5 border-2 rounded-xl focus:ring-4 transition-all outline-none ${
+                          error &&
+                          error.includes("obligatorios") &&
+                          !formData.phoneNumber
+                            ? "border-red-300 focus:border-red-500 focus:ring-red-100"
+                            : "border-gray-200 focus:border-indigo-500 focus:ring-indigo-100"
+                        }`}
+                        placeholder="1234-5678"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {currentStep === 2 && (
+              <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-6 md:p-8">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center shadow-lg">
+                    <GraduationCap size={24} className="text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900">
+                      Carrera o Programa
+                    </h2>
+                    <p className="text-sm text-gray-500">
+                      ¿Qué te gustaría estudiar?
+                    </p>
                   </div>
                 </div>
 
-                {/* Password */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">
-                    Contraseña <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <CreditCard
-                      className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                      size={20}
-                    />
-                    <input
-                      type="password"
-                      name="password"
-                      value={formData.password}
-                      onChange={handleInputChange}
-                      className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all outline-none"
-                      placeholder="Crea una contraseña"
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Documento de Identidad */}
-            <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-6 md:p-8">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg">
-                  <CreditCard size={24} className="text-white" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900">
-                    Documento de Identidad
-                  </h2>
-                  <p className="text-sm text-gray-500">
-                    Información de identificación
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid md:grid-cols-3 gap-6 mb-6">
-                {/* País Emisor */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">
-                    País Emisor <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <Globe
-                      className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                      size={20}
-                    />
+                <div className="grid md:grid-cols-2 gap-6">
+                  {/* Área de Estudio */}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-semibold text-gray-700">
+                      Área de Estudio <span className="text-red-500">*</span>
+                    </label>
                     <select
-                      name="country"
-                      value={formData.country}
-                      onChange={handleInputChange}
-                      className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all outline-none appearance-none bg-white"
+                      name="degree"
+                      value={formData.degree}
+                      onChange={(e) => {
+                        handleInputChange(e);
+                        // Resetear programa cuando cambia el área
+                        setFormData((prev) => ({ ...prev, program: "" }));
+                      }}
+                      className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all outline-none bg-white"
                       required
                     >
-                      <option value="">Selecciona</option>
-                      <option value="Argentina">🇦🇷 Argentina</option>
-                      <option value="Brasil">🇧🇷 Brasil</option>
-                      <option value="Uruguay">🇺🇾 Uruguay</option>
-                      <option value="Chile">🇨🇱 Chile</option>
-                      <option value="Paraguay">🇵🇾 Paraguay</option>
-                      <option value="Colombia">🇨🇴 Colombia</option>
-                      <option value="Perú">🇵🇪 Perú</option>
+                      <option value="">Selecciona un área</option>
+                      {Object.keys(programsByArea)
+                        .sort()
+                        .map((area) => (
+                          <option key={area} value={area}>
+                            {area}
+                          </option>
+                        ))}
                     </select>
                   </div>
-                </div>
 
-                {/* Tipo de Documento */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">
-                    Tipo <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <FileText
-                      className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                      size={20}
-                    />
+                  {/* Tipo de Programa (Online o Presencial) */}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-semibold text-gray-700">
+                      Modalidad <span className="text-red-500">*</span>
+                    </label>
                     <select
-                      name="docType"
-                      value={formData.docType}
+                      name="programType"
+                      value={formData.programType}
                       onChange={handleInputChange}
-                      className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all outline-none appearance-none bg-white"
+                      className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all outline-none bg-white"
                       required
                     >
-                      <option value="">Selecciona</option>
-                      <option value="DNI">DNI</option>
-                      <option value="Pasaporte">Pasaporte</option>
+                      <option value="">Selecciona modalidad</option>
+                      <option value="presencial">🏫 Presencial</option>
+                      <option value="virtual">💻 Online (Virtual)</option>
                     </select>
                   </div>
-                </div>
 
-                {/* Número */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">
-                    Número <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="docNumber"
-                    value={formData.docNumber}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all outline-none"
-                    placeholder="12345678"
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Nacionalidad */}
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-700">
-                  Nacionalidad <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <MapPin
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                    size={20}
-                  />
-                  <input
-                    type="text"
-                    name="nationality"
-                    value={formData.nationality}
-                    onChange={handleInputChange}
-                    className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all outline-none"
-                    placeholder="Argentina"
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Teléfono */}
-            <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-6 md:p-8">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg">
-                  <Phone size={24} className="text-white" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900">
-                    Teléfono de Contacto
-                  </h2>
-                  <p className="text-sm text-gray-500">
-                    ¿Cómo podemos comunicarnos contigo?
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">
-                    Tipo
-                  </label>
-                  <select
-                    name="phoneType"
-                    value={formData.phoneType}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all outline-none bg-white"
-                  >
-                    <option value="movil">📱 Móvil</option>
-                    <option value="fijo">☎️ Fijo</option>
-                  </select>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">
-                    Prefijo <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    name="phonePrefix"
-                    value={formData.phonePrefix}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all outline-none bg-white"
-                    required
-                  >
-                    <option value="">Código</option>
-                    <option value="+54">+54 AR</option>
-                    <option value="+55">+55 BR</option>
-                    <option value="+598">+598 UY</option>
-                    <option value="+56">+56 CL</option>
-                  </select>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">
-                    Área
-                  </label>
-                  <input
-                    type="text"
-                    name="phoneArea"
-                    value={formData.phoneArea}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all outline-none"
-                    placeholder="11"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">
-                    Número <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="phoneNumber"
-                    value={formData.phoneNumber}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all outline-none"
-                    placeholder="1234-5678"
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Carrera o Programa */}
-            <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-6 md:p-8">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center shadow-lg">
-                  <GraduationCap size={24} className="text-white" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900">
-                    Carrera o Programa
-                  </h2>
-                  <p className="text-sm text-gray-500">
-                    ¿Qué te gustaría estudiar?
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                {/* Área de Estudio */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">
-                    Área de Estudio <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    name="degree"
-                    value={formData.degree}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all outline-none bg-white"
-                    required
-                  >
-                    <option value="">Selecciona un área</option>
-                    {formData.degree &&
-                      ![
-                        "Arquitectura",
-                        "Sistemas",
-                        "Derecho",
-                        "Contabilidad",
-                        "Ingenieria",
-                        "Administracion",
-                        "Psicologia",
-                        "Economia",
-                      ].includes(formData.degree) && (
-                        <option value={formData.degree}>
-                          {formData.degree}
-                        </option>
-                      )}
-                    <option value="Arquitectura">🏛️ Arquitectura</option>
-                    <option value="Sistemas">💻 Análisis de Sistemas</option>
-                    <option value="Derecho">⚖️ Derecho</option>
-                    <option value="Contabilidad">📊 Contabilidad</option>
-                    <option value="Ingenieria">⚙️ Ingeniería</option>
-                    <option value="Administracion">📈 Administración</option>
-                    <option value="Psicologia">🧠 Psicología</option>
-                    <option value="Economia">💰 Economía</option>
-                  </select>
-                </div>
-
-                {/* Tipo de Programa */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">
-                    Tipo de Programa <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    name="programType"
-                    value={formData.programType}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all outline-none bg-white"
-                    required
-                  >
-                    <option value="">Selecciona tipo</option>
-                    {formData.programType &&
-                      !["Carreras", "Pregrado", "Cursos"].includes(
-                        formData.programType,
-                      ) && (
-                        <option value={formData.programType}>
-                          {formData.programType}
-                        </option>
-                      )}
-                    <option value="Carreras">Carrera de Grado</option>
-                    <option value="Pregrado">Carrera de Pregrado</option>
-                    <option value="Cursos">Curso/Diplomatura</option>
-                  </select>
-                </div>
-
-                {/* Programa de Interés */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">
-                    Programa de Interés <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    name="program"
-                    value={formData.program}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all outline-none bg-white"
-                    required
-                  >
-                    <option value="">Selecciona programa</option>
-                    {formData.program &&
-                      ![
-                        "Arquitectura",
-                        "Administracion",
-                        "Contabilidad",
-                        "Ingenieria",
-                        "Derecho",
-                        "Abogacia",
-                      ].includes(formData.program) && (
-                        <option value={formData.program}>
-                          {formData.program}
-                        </option>
-                      )}
-                    <option value="Arquitectura">Arquitectura</option>
-                    <option value="Administracion">Administración</option>
-                    <option value="Contabilidad">Contabilidad</option>
-                    <option value="Ingenieria">Ingeniería</option>
-                    <option value="Derecho">Derecho</option>
-                    <option value="Abogacia">Abogacía</option>
-                  </select>
-                </div>
-
-                {/* Período de Inicio */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">
-                    Período de Inicio <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <Calendar
-                      className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                      size={20}
-                    />
+                  {/* Programa de Interés */}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-semibold text-gray-700">
+                      Programa de Interés{" "}
+                      <span className="text-red-500">*</span>
+                    </label>
                     <select
-                      name="startPeriod"
-                      value={formData.startPeriod}
+                      name="program"
+                      value={formData.program}
                       onChange={handleInputChange}
-                      className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all outline-none bg-white"
+                      className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all outline-none bg-white"
                       required
+                      disabled={!formData.degree}
                     >
-                      <option value="">Selecciona período</option>
-                      <option value="Abril">📅 Abril 2024</option>
-                      <option value="Mayo">📅 Mayo 2024</option>
-                      <option value="Junio">📅 Junio 2024</option>
+                      <option value="">
+                        {!formData.degree
+                          ? "Primero selecciona un área"
+                          : "Selecciona programa"}
+                      </option>
+                      {formData.degree &&
+                        programsByArea[formData.degree]?.map((prog) => (
+                          <option key={prog} value={prog}>
+                            {prog}
+                          </option>
+                        ))}
                     </select>
+                  </div>
+
+                  {/* Período de Inicio */}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-semibold text-gray-700">
+                      Período de Inicio <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <Calendar
+                        className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                        size={20}
+                      />
+                      <select
+                        name="startPeriod"
+                        value={formData.startPeriod}
+                        onChange={handleInputChange}
+                        className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all outline-none bg-white"
+                        required
+                      >
+                        <option value="">Selecciona período</option>
+                        <option value="Abril">📅 Abril 2024</option>
+                        <option value="Mayo">📅 Mayo 2024</option>
+                        <option value="Junio">📅 Junio 2024</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
 
-            {/* Submit Button */}
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              type="submit"
-              disabled={isSubmitting}
-              className={`w-full md:w-auto px-12 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 group ${
-                isSubmitting ? "opacity-70 cursor-not-allowed" : ""
-              }`}
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>Procesando...</span>
-                </>
-              ) : (
-                <>
-                  <span>Enviar y Continuar</span>
-                  <ArrowRight
-                    size={20}
-                    className="group-hover:translate-x-1 transition-transform"
-                  />
-                </>
+            {currentStep === 3 && (
+              <div className="space-y-6">
+                {/* Documentación */}
+                <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-6 md:p-8">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center shadow-lg">
+                      <Upload size={24} className="text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900">
+                        Documentación Requerida
+                      </h2>
+                      <p className="text-sm text-gray-500">
+                        Sube los documentos necesarios para validar tu
+                        inscripción
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-8">
+                    {/* DNI Upload */}
+                    <div className="space-y-4">
+                      <label className="block text-sm font-semibold text-gray-700">
+                        Foto del DNI (Frente){" "}
+                        <span className="text-red-500">*</span>
+                        <span className="block text-xs font-normal text-gray-400 mt-1">
+                          Formato aceptado: PNG
+                        </span>
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="file"
+                          accept="image/png"
+                          onChange={(e) => handleFileChange(e, "dni")}
+                          className="hidden"
+                          id="dni-upload"
+                          required
+                        />
+                        <label
+                          htmlFor="dni-upload"
+                          className={`
+                            flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-2xl cursor-pointer transition-all
+                            ${
+                              dniFile
+                                ? "border-green-400 bg-green-50"
+                                : "border-gray-200 hover:border-indigo-400 hover:bg-indigo-50/30"
+                            }
+                          `}
+                        >
+                          {dniFile ? (
+                            <div className="flex flex-col items-center text-green-600">
+                              <Check className="w-10 h-10 mb-2" />
+                              <span className="text-sm font-medium">
+                                DNI Cargado
+                              </span>
+                              <span className="text-xs text-green-500 mt-1">
+                                {dniFile.name}
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center text-gray-400">
+                              <Upload className="w-10 h-10 mb-2" />
+                              <span className="text-sm font-medium">
+                                Seleccionar PNG
+                              </span>
+                            </div>
+                          )}
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* Degree Upload */}
+                    <div className="space-y-4">
+                      <label className="block text-sm font-semibold text-gray-700">
+                        Título o Certificado de Estudios{" "}
+                        <span className="text-red-500">*</span>
+                        <span className="block text-xs font-normal text-gray-400 mt-1">
+                          Formato aceptado: PDF
+                        </span>
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="file"
+                          accept="application/pdf"
+                          onChange={(e) => handleFileChange(e, "degree")}
+                          className="hidden"
+                          id="degree-upload"
+                          required
+                        />
+                        <label
+                          htmlFor="degree-upload"
+                          className={`
+                            flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-2xl cursor-pointer transition-all
+                            ${
+                              degreeFile
+                                ? "border-green-400 bg-green-50"
+                                : "border-gray-200 hover:border-indigo-400 hover:bg-indigo-50/30"
+                            }
+                          `}
+                        >
+                          {degreeFile ? (
+                            <div className="flex flex-col items-center text-green-600">
+                              <File className="w-10 h-10 mb-2" />
+                              <span className="text-sm font-medium">
+                                Título Cargado
+                              </span>
+                              <span className="text-xs text-green-500 mt-1">
+                                {degreeFile.name}
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center text-gray-400">
+                              <File className="w-10 h-10 mb-2" />
+                              <span className="text-sm font-medium">
+                                Seleccionar PDF
+                              </span>
+                            </div>
+                          )}
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Pago de Matrícula (Informativo) */}
+                <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-6 md:p-8">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center shadow-lg">
+                      <CreditCard size={24} className="text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900">
+                        Reserva de Vacante
+                      </h2>
+                      <p className="text-sm text-gray-500">
+                        Completa tu inscripción con el pago de la matrícula
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-8 border-2 border-dashed border-gray-200 rounded-3xl text-center">
+                    <div className="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <CreditCard className="w-8 h-8 text-indigo-600" />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      Módulo de Pago en Desarrollo
+                    </h3>
+                    <p className="text-gray-500 max-w-md mx-auto mb-6">
+                      Por el momento, puedes finalizar tu inscripción sin
+                      realizar el pago. Nos pondremos en contacto contigo para
+                      coordinar la matrícula.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Navigation Buttons */}
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-6">
+              {currentStep > 1 && (
+                <button
+                  type="button"
+                  onClick={handlePrevStep}
+                  className="w-full md:w-auto px-8 py-4 border-2 border-gray-200 text-gray-600 font-bold rounded-2xl hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
+                >
+                  Atrás
+                </button>
               )}
-            </motion.button>
+
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="submit"
+                disabled={isSubmitting}
+                className={`w-full md:w-auto px-12 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 group ml-auto ${
+                  isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+                }`}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>Procesando...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>
+                      {currentStep === 3
+                        ? "Finalizar Inscripción"
+                        : "Siguiente"}
+                    </span>
+                    <ArrowRight
+                      size={20}
+                      className="group-hover:translate-x-1 transition-transform"
+                    />
+                  </>
+                )}
+              </motion.button>
+            </div>
           </motion.form>
         )}
       </div>

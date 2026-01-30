@@ -69,11 +69,11 @@ export const About: React.FC = () => {
   ];
 
   const history = {
-    title: "Historia",
-    icon: "📚",
+    title: "Nuestra Trayectoria",
+    icon: "🏛️",
     content: [
-      "Nuestra universidad fue fundada en 2010 con el objetivo de formar profesionales capaces de enfrentar los desafíos. Desde entonces, hemos crecido y nos hemos consolidado como una institución de prestigio, comprometida con la formación integral de nuestros estudiantes y el avance del conocimiento a través de la investigación.",
-      "A lo largo de los años, hemos ampliado nuestra oferta académica, modernizado nuestras instalaciones y fortalecido nuestras alianzas con otras instituciones y empresas. Nuestros egresados ocupan posiciones destacadas en diversos campos profesionales y contribuyen de manera significativa al desarrollo económico, social y cultural del país.",
+      "Nacida de una visión audaz en 2010, nuestra institución emergió con la determinación de redefinir la educación superior. Lo que comenzó como un proyecto enfocado en la excelencia académica se ha transformado en un ecosistema de innovación donde el conocimiento se encuentra con la práctica real.",
+      "A través de una década de crecimiento sostenido, hemos forjado una comunidad vibrante de pensadores, creadores y líderes. Nuestra evolución no se mide solo en la modernización de nuestros campus o la expansión de nuestras facultades, sino en el impacto tangible de nuestros graduados, quienes hoy lideran la transformación digital y social en toda la región.",
     ],
   };
 

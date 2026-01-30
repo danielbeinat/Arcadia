@@ -34,6 +34,7 @@ export class UserController {
   ): Promise<void> => {
     try {
       const { id } = req.params;
+      if (!id) throw new AppError("ID de usuario requerido", 400);
       const user = await DatabaseService.findUserById(id);
 
       if (!user) {
@@ -64,6 +65,7 @@ export class UserController {
   ): Promise<void> => {
     try {
       const { id } = req.params;
+      if (!id) throw new AppError("ID de usuario requerido", 400);
       const user = await DatabaseService.findUserById(id);
 
       if (!user) {
@@ -73,7 +75,10 @@ export class UserController {
       const updatedUser = await DatabaseService.rejectUser(id);
 
       // Enviar correo de rechazo
-      await EmailService.sendRejectionEmail(updatedUser.email, updatedUser.name);
+      await EmailService.sendRejectionEmail(
+        updatedUser.email,
+        updatedUser.name,
+      );
 
       const { password, ...userWithoutPassword } = updatedUser;
 
@@ -115,6 +120,7 @@ export class UserController {
   ): Promise<void> => {
     try {
       const { id } = req.params;
+      if (!id) throw new AppError("ID de usuario requerido", 400);
       const user = await DatabaseService.findUserById(id);
 
       if (!user) {
@@ -234,6 +240,7 @@ export class UserController {
   ): Promise<void> => {
     try {
       const { id } = req.params;
+      if (!id) throw new AppError("ID de usuario requerido", 400);
       const updatedUser = await DatabaseService.updateUser(id, {
         ...req.body,
         updatedAt: new Date().toISOString(),
@@ -258,6 +265,7 @@ export class UserController {
   ): Promise<void> => {
     try {
       const { id } = req.params;
+      if (!id) throw new AppError("ID de usuario requerido", 400);
       await DatabaseService.deleteUser(id);
 
       res.status(200).json({

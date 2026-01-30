@@ -56,9 +56,6 @@ const Category = lazy(() =>
     default: m.Category,
   })),
 );
-const Register = lazy(() =>
-  import("./pages/Count/Register").then((m) => ({ default: m.Register })),
-);
 const ValidateAccount = lazy(() =>
   import("./pages/ValidateAccount/ValidateAccount").then((m) => ({
     default: m.ValidateAccount,
@@ -77,6 +74,8 @@ const Unauthorized = lazy(() =>
     default: m.Unauthorized,
   })),
 );
+
+import { ScrollToTop } from "./Components/ScrollToTop";
 
 export const App: React.FC = () => {
   useEffect(() => {
@@ -99,6 +98,7 @@ export const App: React.FC = () => {
   return (
     <NotificationProvider>
       <AuthProvider>
+        <ScrollToTop />
         <NavBar />
 
         <Suspense
@@ -125,7 +125,9 @@ export const App: React.FC = () => {
             <Route
               path="/dashboard"
               element={
-                <ProtectedRoute allowedRoles={["ADMIN", "PROFESSOR", "STUDENT"]}>
+                <ProtectedRoute
+                  allowedRoles={["ADMIN", "PROFESSOR", "STUDENT"]}
+                >
                   <Dashboard />
                 </ProtectedRoute>
               }
@@ -143,7 +145,6 @@ export const App: React.FC = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/inscripciones" element={<Inscription />} />
             <Route path="/area/:category" element={<Category />} />
-            <Route path="/register" element={<Register />} />
             <Route path="/validate-account" element={<ValidateAccount />} />
             <Route path="/career/:careerId" element={<DisplayDegree />} />
             <Route path="/eventos" element={<Events />} />

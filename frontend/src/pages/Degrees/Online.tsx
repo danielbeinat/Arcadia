@@ -1,5 +1,8 @@
 import React from "react";
-import { AllDegrees } from "../../assets/AllDegrees/AllDegrees";
+import {
+  AllDegrees,
+  NormalizedDegrees,
+} from "../../assets/AllDegrees/AllDegrees";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { DegreeCard } from "../../Components/DegreeCard/DegreeCard";
@@ -14,16 +17,20 @@ export const Online: React.FC = () => {
 
   const handleEnroll = (item: any) => {
     window.scrollTo(0, 0);
-    navigate("/inscription", {
+    navigate("/inscripciones", {
       state: {
-        degree: item.category,
+        degree:
+          item.category.charAt(0).toUpperCase() +
+          item.category.slice(1).replace("-", " "),
         program: item.name,
-        programType: item.program,
+        programType: item.type === "virtual" ? "virtual" : "presencial",
       },
     });
   };
 
-  const Degree = AllDegrees.filter((item) => item.Type === "virtual");
+  const filteredDegrees = NormalizedDegrees.filter(
+    (item) => item.type === "virtual",
+  );
   return (
     <>
       <div className="mb-20">
@@ -94,48 +101,70 @@ export const Online: React.FC = () => {
                 stroke="white"
                 strokeWidth="3"
               />
-              <rect x="145" y="195" width="30" height="6" rx="3" fill="white" />
+              <rect x="145" y="195" width="30" height="5" rx="2" fill="white" />
 
               {/* Text */}
               <text
-                x="420"
+                x="380"
                 y="140"
-                fill="#6D28D9"
-                fontSize="36"
-                fontWeight="800"
-                fontFamily="Arial, Helvetica, sans-serif"
+                className="text-4xl font-black fill-gray-900"
+                style={{ fontFamily: "Inter, sans-serif" }}
               >
-                CARRERAS
+                Carreras Virtuales
               </text>
               <text
-                x="420"
-                y="185"
-                fill="#6D28D9"
-                fontSize="36"
-                fontWeight="800"
-                fontFamily="Arial, Helvetica, sans-serif"
+                x="380"
+                y="180"
+                className="text-lg fill-gray-500 font-medium"
+                style={{ fontFamily: "Inter, sans-serif" }}
               >
-                VIRTUALES
+                Estudia a tu ritmo con nuestra plataforma de vanguardia
               </text>
+
+              {/* Badges */}
+              <rect
+                x="380"
+                y="210"
+                width="140"
+                height="32"
+                rx="16"
+                fill="#F3F4F6"
+              />
               <text
-                x="420"
-                y="225"
-                fill="#555555"
-                fontSize="18"
-                fontFamily="Arial, Helvetica, sans-serif"
+                x="400"
+                y="231"
+                className="text-xs font-bold fill-gray-600 uppercase"
               >
-                Estudiá a tu ritmo desde cualquier lugar
+                100% Online
+              </text>
+
+              <rect
+                x="530"
+                y="210"
+                width="180"
+                height="32"
+                rx="16"
+                fill="#EEF2FF"
+              />
+              <text
+                x="550"
+                y="231"
+                className="text-xs font-bold fill-indigo-600 uppercase"
+              >
+                Campus 24/7
               </text>
             </svg>
           </motion.div>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 mt-[100px] px-4 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {Degree.map((item) => (
+      <div className="max-w-7xl mx-auto px-4 mb-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {filteredDegrees.map((item) => (
             <DegreeCard
               key={item.id}
               item={item}
-              onClick={handleCardClick}
+              onClick={() => handleCardClick(item.id)}
               onEnroll={handleEnroll}
             />
           ))}

@@ -83,13 +83,15 @@ export const Courses: React.FC = () => {
     navigate(`/career/${id}`);
   };
 
-  const handleEnroll = (item: any) => {
+  const handleEnroll = (item: Degree) => {
     window.scrollTo(0, 0);
-    navigate("/inscription", {
+    navigate("/inscripciones", {
       state: {
-        degree: item.category,
+        degree:
+          item.category.charAt(0).toUpperCase() +
+          item.category.slice(1).replace("-", " "),
         program: item.name,
-        programType: item.program,
+        programType: item.type === "virtual" ? "virtual" : "presencial",
       },
     });
   };
@@ -240,7 +242,7 @@ export const Courses: React.FC = () => {
                 fill="#6D28D9"
                 fontSize="36"
                 fontWeight="800"
-                fontFamily="Arial, Helvetica, sans-serif"
+                style={{ fontFamily: "Inter, sans-serif" }}
               >
                 NUESTROS
               </text>
@@ -250,7 +252,7 @@ export const Courses: React.FC = () => {
                 fill="#6D28D9"
                 fontSize="36"
                 fontWeight="800"
-                fontFamily="Arial, Helvetica, sans-serif"
+                style={{ fontFamily: "Inter, sans-serif" }}
               >
                 CURSOS
               </text>
@@ -259,7 +261,7 @@ export const Courses: React.FC = () => {
                 y="225"
                 fill="#555555"
                 fontSize="18"
-                fontFamily="Arial, Helvetica, sans-serif"
+                style={{ fontFamily: "Inter, sans-serif" }}
               >
                 Especialízate con los mejores expertos
               </text>

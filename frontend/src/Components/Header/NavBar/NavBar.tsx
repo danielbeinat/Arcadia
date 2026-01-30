@@ -54,13 +54,18 @@ export const NavBar = () => {
     setOpenMenu(null);
     setOpenProfile(false);
     setMobileOpen(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleLogoClick = () => {
+    closeAll();
   };
 
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-50 bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link to="/" onClick={closeAll}>
+          <Link to="/" onClick={handleLogoClick}>
             <img src={logo} alt="Logo" className="h-10" />
           </Link>
 

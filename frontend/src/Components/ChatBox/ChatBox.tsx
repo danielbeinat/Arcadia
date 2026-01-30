@@ -1,11 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { MessageCircle, X, Send, Sparkles, User, Mail, MessageSquare, CheckCircle } from "lucide-react";
+import {
+  MessageCircle,
+  X,
+  Send,
+  Sparkles,
+  User,
+  Mail,
+  MessageSquare,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
+import { api } from "../../services/api";
 
 export const ChatBox = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -24,20 +36,30 @@ export const ChatBox = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError(null);
 
-    // Simular envío al servidor
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      const response = await api.submitChatbotInquiry({
+        nombre: formData.name,
+        email: formData.email,
+        mensaje: formData.subject,
+      });
 
-    console.log("Form submitted:", formData);
-    
-    setIsSubmitting(false);
-    setShowSuccess(true);
-
-    // Resetear formulario después de 3 segundos
-    setTimeout(() => {
-      setFormData({ name: "", email: "", subject: "" });
-      setShowSuccess(false);
-    }, 3000);
+      if (response.success) {
+        setShowSuccess(true);
+        // Resetear formulario después de 3 segundos
+        setTimeout(() => {
+          setFormData({ name: "", email: "", subject: "" });
+          setShowSuccess(false);
+        }, 3000);
+      } else {
+        setError(response.message || "Error al enviar la consulta");
+      }
+    } catch (err: any) {
+      setError(err.message || "Ocurrió un error inesperado");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,11 +78,13 @@ export const ChatBox = () => {
         <div className="relative">
           {/* Glow effect */}
           <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full blur-lg opacity-60 group-hover:opacity-80 transition-opacity duration-300 animate-pulse-glow" />
-          
+
           {/* Main button */}
-          <div className="relative p-3 md:p-4 rounded-full bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-700 
+          <div
+            className="relative p-3 md:p-4 rounded-full bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-700 
             shadow-xl hover:shadow-2xl transform hover:scale-110 transition-all duration-300 
-            hover:rotate-12 active:scale-95">
+            hover:rotate-12 active:scale-95"
+          >
             {isOpen ? (
               <X className="w-6 h-6 md:w-7 md:h-7 text-white transition-transform duration-300 group-hover:rotate-90" />
             ) : (
@@ -70,9 +94,13 @@ export const ChatBox = () => {
 
           {/* Notification badge */}
           {!isOpen && (
-            <div className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-pink-500 to-rose-500 
-              rounded-full border-2 border-white shadow-lg animate-bounce">
-              <span className="flex items-center justify-center h-full text-white text-xs font-bold">1</span>
+            <div
+              className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-pink-500 to-rose-500 
+              rounded-full border-2 border-white shadow-lg animate-bounce"
+            >
+              <span className="flex items-center justify-center h-full text-white text-xs font-bold">
+                1
+              </span>
             </div>
           )}
         </div>
@@ -80,31 +108,35 @@ export const ChatBox = () => {
 
       {/* Chat Window */}
       {isOpen && (
-        <div 
+        <div
           className={`fixed bottom-24 md:bottom-28 right-4 left-4 md:right-8 md:left-auto z-40 w-auto md:w-full md:max-w-md lg:max-w-sm
             transition-all duration-500 ease-out ${
-              isVisible 
-                ? 'opacity-100 translate-y-0 scale-100' 
-                : 'opacity-0 translate-y-8 scale-95'
+              isVisible
+                ? "opacity-100 translate-y-0 scale-100"
+                : "opacity-0 translate-y-8 scale-95"
             }`}
         >
           {/* Glass morphism card */}
           <div className="relative bg-white/95 backdrop-blur-2xl rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden border border-white/20 max-h-[calc(100vh-140px)] md:max-h-[600px] lg:max-h-[500px] flex flex-col">
             {/* Decorative gradient background */}
             <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-50 opacity-50" />
-            
+
             {/* Header */}
             <div className="relative bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-700 p-4 md:p-6 lg:p-4 flex-shrink-0">
               <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLW9wYWNpdHk9IjAuMSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-30" />
-              
+
               <div className="relative flex items-center justify-between">
                 <div className="flex items-center gap-2 md:gap-3">
                   <div className="p-1.5 md:p-2 bg-white/20 rounded-lg md:rounded-xl backdrop-blur-sm">
                     <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-white font-bold text-base md:text-lg">¡Hola! 👋</h2>
-                    <p className="text-white/80 text-xs md:text-sm">Instituto Arcadia</p>
+                    <h2 className="text-white font-bold text-base md:text-lg">
+                      ¡Hola! 👋
+                    </h2>
+                    <p className="text-white/80 text-xs md:text-sm">
+                      Instituto Arcadia
+                    </p>
                   </div>
                 </div>
                 <button
@@ -126,9 +158,12 @@ export const ChatBox = () => {
                   <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mb-4 animate-bounce">
                     <CheckCircle className="w-10 h-10 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-slate-800 mb-2">¡Mensaje Enviado!</h3>
+                  <h3 className="text-xl font-bold text-slate-800 mb-2">
+                    ¡Mensaje Enviado!
+                  </h3>
                   <p className="text-slate-600 text-center text-sm">
-                    Gracias por contactarnos. Un agente se comunicará contigo pronto.
+                    Gracias por contactarnos. Un agente se comunicará contigo
+                    pronto.
                   </p>
                 </div>
               ) : (
@@ -136,14 +171,26 @@ export const ChatBox = () => {
                   {/* Welcome message */}
                   <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl md:rounded-2xl lg:rounded-xl p-3 md:p-4 lg:p-3 border border-blue-100">
                     <p className="text-slate-700 text-xs md:text-sm lg:text-xs leading-relaxed">
-                      <span className="font-semibold text-blue-700">¿Necesitas ayuda?</span>
+                      <span className="font-semibold text-blue-700">
+                        ¿Necesitas ayuda?
+                      </span>
                       <br />
                       Completa el formulario y un agente te atenderá en breve.
                     </p>
                   </div>
 
+                  {error && (
+                    <div className="p-3 bg-rose-50 border border-rose-100 rounded-xl flex items-center gap-2 text-rose-600 text-xs animate-shake">
+                      <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                      <span>{error}</span>
+                    </div>
+                  )}
+
                   {/* Form */}
-                  <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4 lg:space-y-3">
+                  <form
+                    onSubmit={handleSubmit}
+                    className="space-y-3 md:space-y-4 lg:space-y-3"
+                  >
                     {/* Name Input */}
                     <div className="relative group">
                       <div className="absolute left-3 md:left-4 lg:left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors duration-200">
@@ -219,10 +266,12 @@ export const ChatBox = () => {
                     >
                       {/* Button shine effect */}
                       {!isSubmitting && (
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent 
-                          translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                        <div
+                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent 
+                          translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
+                        />
                       )}
-                      
+
                       {isSubmitting ? (
                         <>
                           <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -239,7 +288,8 @@ export const ChatBox = () => {
 
                   {/* Footer note */}
                   <p className="text-center text-[10px] md:text-xs lg:text-[10px] text-slate-500">
-                    Respetamos tu privacidad. Tus datos están seguros con nosotros. 🔒
+                    Respetamos tu privacidad. Tus datos están seguros con
+                    nosotros. 🔒
                   </p>
                 </>
               )}

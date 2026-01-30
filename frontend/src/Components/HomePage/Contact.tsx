@@ -1,22 +1,60 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, AlertCircle } from "lucide-react";
 import students from "../../assets/AllDegrees/Images/students.webp";
+import { api } from "../../services/api";
 
 export const Contact: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    nombre: "",
+    apellido: "",
+    email: "",
+    telefono: "",
+    provincia: "Buenos Aires",
+    tipoCarrera: "Carreras de Grado",
+    modalidad: "Presencial",
+  });
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError(null);
 
-    await new Promise((r) => setTimeout(r, 1500));
+    try {
+      const response = await api.submitContactForm(formData);
+      if (response.success) {
+        setShowSuccess(true);
+        setFormData({
+          nombre: "",
+          apellido: "",
+          email: "",
+          telefono: "",
+          provincia: "Buenos Aires",
+          tipoCarrera: "Carreras de Grado",
+          modalidad: "Presencial",
+        });
 
-    setIsSubmitting(false);
-    setShowSuccess(true);
-
-    setTimeout(() => setShowSuccess(false), 4000);
+        setTimeout(() => {
+          setShowSuccess(false);
+        }, 4000);
+      } else {
+        setError(response.message || "Error al enviar la solicitud");
+      }
+    } catch (err: any) {
+      setError(err.message || "Ocurrió un error inesperado");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -86,33 +124,80 @@ export const Contact: React.FC = () => {
                   </p>
                 </div>
 
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 text-red-700 text-sm"
+                  >
+                    <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                    <span>{error}</span>
+                  </motion.div>
+                )}
+
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid md:grid-cols-2 gap-6">
-                    <FloatingInput label="Nombre" required />
-                    <FloatingInput label="Apellido" required />
+                    <FloatingInput
+                      label="Nombre"
+                      name="nombre"
+                      value={formData.nombre}
+                      onChange={handleInputChange}
+                      required
+                    />
+                    <FloatingInput
+                      label="Apellido"
+                      name="apellido"
+                      value={formData.apellido}
+                      onChange={handleInputChange}
+                      required
+                    />
                   </div>
 
                   <FloatingInput
                     label="Correo electrónico"
                     type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
                     required
                   />
-                  <FloatingInput label="Teléfono" required />
+                  <FloatingInput
+                    label="Teléfono"
+                    name="telefono"
+                    value={formData.telefono}
+                    onChange={handleInputChange}
+                    required
+                  />
 
-                  <FloatingSelect label="Provincia">
+                  <FloatingSelect
+                    label="Provincia"
+                    name="provincia"
+                    value={formData.provincia}
+                    onChange={handleInputChange}
+                  >
                     <option>Buenos Aires</option>
                     <option>Córdoba</option>
                     <option>Santa Fe</option>
                   </FloatingSelect>
 
                   <div className="grid md:grid-cols-2 gap-6">
-                    <FloatingSelect label="Tipo de carrera">
+                    <FloatingSelect
+                      label="Tipo de carrera"
+                      name="tipoCarrera"
+                      value={formData.tipoCarrera}
+                      onChange={handleInputChange}
+                    >
                       <option>Carreras de Grado</option>
                       <option>Posgrados</option>
                       <option>Cursos</option>
                     </FloatingSelect>
 
-                    <FloatingSelect label="Modalidad">
+                    <FloatingSelect
+                      label="Modalidad"
+                      name="modalidad"
+                      value={formData.modalidad}
+                      onChange={handleInputChange}
+                    >
                       <option>Presencial</option>
                       <option>Online</option>
                       <option>Híbrida</option>
@@ -142,7 +227,7 @@ export const Contact: React.FC = () => {
 const FloatingInput = ({
   label,
   ...props
-}: React.InputHTMLAttributes<HTMLInputElement>) => (
+}: React.InputHTMLAttributes<HTMLInputElement> & { label: string }) => (
   <div className="relative">
     <input
       {...props}
@@ -163,12 +248,11 @@ const FloatingInput = ({
 const FloatingSelect = ({
   label,
   children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) => (
+  ...props
+}: React.SelectHTMLAttributes<HTMLSelectElement> & { label: string }) => (
   <div className="relative">
     <select
+      {...props}
       className="peer w-full px-4 pt-6 pb-2 rounded-xl border border-gray-200 bg-white
       focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 outline-none transition"
     >

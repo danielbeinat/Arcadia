@@ -22,6 +22,17 @@ model User {
   program       String
   semester      Int?
   avatar        String?
+  dniUrl        String?
+  degreeUrl     String?
+  country       String?
+  docType       String?
+  docNumber     String?
+  nationality   String?
+  phonePrefix   String?
+  phoneNumber   String?
+  degree        String?
+  programType   String?
+  startPeriod   String?
   enrollmentDate DateTime @default(now())
   status        UserStatus @default(PENDIENTE)
   validationToken String?

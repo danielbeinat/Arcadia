@@ -46,7 +46,7 @@ export const Requirements: React.FC = () => {
     {
       title: "Documentación Extra",
       description:
-        "Algunos programas requieren cartas de recomendación, portafolios o certificados de idiomas.",
+        "Para programas específicos, se podrán solicitar entrevistas personales, portafolios creativos o acreditaciones de idiomas adicionales.",
       icon: "📎",
     },
   ];

@@ -10,9 +10,6 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("🌱 Seeding database...");
-
-  // 0. Create an Admin
   const adminPassword = await bcrypt.hash("admin123", 10);
   await prisma.user.upsert({
     where: { email: "admin@arcadia.edu" },
@@ -28,9 +25,6 @@ async function main() {
     },
   });
 
-  console.log("✅ Admin created (admin@arcadia.edu / admin123)");
-
-  // 1. Create a Professor
   const hashedPassword = await bcrypt.hash("prof123", 10);
   const professor = await prisma.user.upsert({
     where: { email: "profesor@arcadia.edu" },
@@ -46,9 +40,6 @@ async function main() {
     },
   });
 
-  console.log("✅ Professor created");
-
-  // 2. Create Degrees
   const degreeIng = await prisma.degree.create({
     data: {
       name: "Ingeniería en Sistemas",
@@ -76,9 +67,6 @@ async function main() {
     },
   });
 
-  console.log("✅ Degrees created");
-
-  // 3. Create Courses
   await prisma.course.create({
     data: {
       code: "ING101",

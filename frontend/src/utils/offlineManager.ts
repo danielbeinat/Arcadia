@@ -5,6 +5,8 @@ export interface OfflineCourse {
   duration: string;
   image: string;
   program: string;
+  type: string;
+  time: string;
   cachedAt: number;
 }
 
@@ -26,10 +28,9 @@ class OfflineManager {
   async initializeServiceWorker() {
     if ("serviceWorker" in navigator) {
       try {
-        const registration = await navigator.serviceWorker.register("/sw.js");
-        console.log("Service Worker registered:", registration);
+        await navigator.serviceWorker.register("/sw.js");
       } catch (error) {
-        console.error("Service Worker registration failed:", error);
+        // Silent fail in development
       }
     }
   }
@@ -43,6 +44,8 @@ class OfflineManager {
         duration: course.duration,
         image: course.image,
         program: course.program,
+        type: course.type,
+        time: course.time,
         cachedAt: Date.now(),
       }));
 
@@ -54,13 +57,11 @@ class OfflineManager {
 
       localStorage.setItem(this.OFFLINE_DATA_KEY, JSON.stringify(offlineData));
 
-      // Cache only local images (skip external ones like freepik.com)
       const cache = await caches.open(this.CACHE_NAME);
       const imageUrls = courses
         .map((course) => course.image)
         .filter(Boolean)
         .filter((url: string) => {
-          // Only cache same-origin images to avoid CORS issues
           try {
             const urlObj = new URL(url);
             return urlObj.hostname === window.location.hostname;
@@ -72,10 +73,8 @@ class OfflineManager {
       if (imageUrls.length > 0) {
         await cache.addAll(imageUrls);
       }
-
-      console.log("Course data cached successfully");
     } catch (error) {
-      console.error("Failed to cache course data:", error);
+      // Silent error handling for background caching
     }
   }
 
@@ -86,8 +85,7 @@ class OfflineManager {
 
       const offlineData: OfflineData = JSON.parse(data);
 
-      // Check if cache is too old (7 days)
-      const maxAge = 7 * 24 * 60 * 60 * 1000; // 7 days in ms
+      const maxAge = 7 * 24 * 60 * 60 * 1000;
       if (Date.now() - offlineData.lastUpdated > maxAge) {
         this.clearCache();
         return [];
@@ -95,7 +93,6 @@ class OfflineManager {
 
       return offlineData.courses;
     } catch (error) {
-      console.error("Failed to get cached courses:", error);
       return [];
     }
   }
@@ -106,9 +103,8 @@ class OfflineManager {
       const cache = await caches.open(this.CACHE_NAME);
       const keys = await cache.keys();
       await Promise.all(keys.map((key) => cache.delete(key)));
-      console.log("Cache cleared successfully");
     } catch (error) {
-      console.error("Failed to clear cache:", error);
+      // Ignore errors
     }
   }
 
@@ -126,27 +122,38 @@ class OfflineManager {
         ? apiUrl.replace("/api", "/health")
         : `${apiUrl}/health`;
 
-      const response = await fetch(healthUrl, {
-        method: "HEAD",
-        mode: "cors",
-        cache: "no-cache",
-      });
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // Increased to 10s timeout
 
-      if (response.ok) {
-        const connection =
-          (navigator as any).connection ||
-          (navigator as any).mozConnection ||
-          (navigator as any).webkitConnection;
-        if (connection && connection.effectiveType) {
-          const slowConnections = ["slow-2g", "2g", "3g"];
-          return slowConnections.includes(connection.effectiveType)
-            ? "slow"
-            : "online";
+      try {
+        const response = await fetch(healthUrl, {
+          method: "GET",
+          mode: "cors",
+          cache: "no-cache",
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+          const connection =
+            (navigator as any).connection ||
+            (navigator as any).mozConnection ||
+            (navigator as any).webkitConnection;
+          if (connection && connection.effectiveType) {
+            const slowConnections = ["slow-2g", "2g", "3g"];
+            return slowConnections.includes(connection.effectiveType)
+              ? "slow"
+              : "online";
+          }
+          return "online";
         }
-        return "online";
+        return "offline";
+      } catch (fetchError: any) {
+        clearTimeout(timeoutId);
+        return "offline";
       }
-      return "offline";
-    } catch {
+    } catch (error) {
       return "offline";
     }
   }

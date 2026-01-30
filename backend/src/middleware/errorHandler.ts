@@ -38,6 +38,16 @@ export const errorHandler = (
   } else if (error.name === 'TokenExpiredError') {
     statusCode = 401;
     message = 'Token expired';
+  } else if (error.constructor.name.startsWith('PrismaClient')) {
+    // Manejar errores de Prisma
+    if ((error as any).code === 'P2002') {
+      statusCode = 409;
+      const target = (error as any).meta?.target;
+      message = `El valor para el campo ${target} ya existe.`;
+    } else {
+      statusCode = 400;
+      message = 'Error en la base de datos: ' + error.message;
+    }
   }
 
   // Log error for debugging

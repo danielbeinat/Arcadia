@@ -1,8 +1,12 @@
 import React from "react";
-import { AllDegrees } from "../../assets/AllDegrees/AllDegrees";
+import {
+  AllDegrees,
+  NormalizedDegrees,
+} from "../../assets/AllDegrees/AllDegrees";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { DegreeCard } from "../../Components/DegreeCard/DegreeCard";
+import { Degree } from "../../types/Degree";
 
 export const OnCampus: React.FC = () => {
   const navigate = useNavigate();
@@ -11,18 +15,22 @@ export const OnCampus: React.FC = () => {
     navigate(`/career/${id}`);
   };
 
-  const handleEnroll = (item: any) => {
+  const handleEnroll = (item: Degree) => {
     window.scrollTo(0, 0);
-    navigate("/inscription", {
+    navigate("/inscripciones", {
       state: {
-        degree: item.category,
+        degree:
+          item.category.charAt(0).toUpperCase() +
+          item.category.slice(1).replace("-", " "),
         program: item.name,
-        programType: item.program,
+        programType: item.type === "virtual" ? "virtual" : "presencial",
       },
     });
   };
 
-  const Degree = AllDegrees.filter((item) => item.Type === "presencial");
+  const filteredDegrees = NormalizedDegrees.filter(
+    (item) => item.type === "presencial",
+  );
   return (
     <>
       <div className="mb-20">
@@ -93,44 +101,66 @@ export const OnCampus: React.FC = () => {
 
               {/* Text */}
               <text
-                x="420"
+                x="380"
                 y="140"
-                fill="#6D28D9"
-                fontSize="36"
-                fontWeight="800"
-                fontFamily="Arial, Helvetica, sans-serif"
+                className="text-4xl font-black fill-gray-900"
+                style={{ fontFamily: "Inter, sans-serif" }}
               >
-                CARRERAS
+                Carreras Presenciales
               </text>
               <text
-                x="420"
-                y="185"
-                fill="#6D28D9"
-                fontSize="36"
-                fontWeight="800"
-                fontFamily="Arial, Helvetica, sans-serif"
+                x="380"
+                y="180"
+                className="text-lg fill-gray-500 font-medium"
+                style={{ fontFamily: "Inter, sans-serif" }}
               >
-                PRESENCIALES
+                Formación académica de excelencia en nuestro campus
               </text>
+
+              {/* Badges */}
+              <rect
+                x="380"
+                y="210"
+                width="140"
+                height="32"
+                rx="16"
+                fill="#F3F4F6"
+              />
               <text
-                x="420"
-                y="225"
-                fill="#555555"
-                fontSize="18"
-                fontFamily="Arial, Helvetica, sans-serif"
+                x="400"
+                y="231"
+                className="text-xs font-bold fill-gray-600 uppercase"
               >
-                Capacitate profesionalmente hoy
+                +20 Carreras
+              </text>
+
+              <rect
+                x="530"
+                y="210"
+                width="160"
+                height="32"
+                rx="16"
+                fill="#EEF2FF"
+              />
+              <text
+                x="550"
+                y="231"
+                className="text-xs font-bold fill-indigo-600 uppercase"
+              >
+                Títulos Oficiales
               </text>
             </svg>
           </motion.div>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 mt-[100px] px-4 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {Degree.map((item) => (
+      <div className="max-w-7xl mx-auto px-4 mb-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {filteredDegrees.map((item) => (
             <DegreeCard
               key={item.id}
               item={item}
-              onClick={handleCardClick}
+              onClick={() => handleCardClick(item.id)}
               onEnroll={handleEnroll}
             />
           ))}

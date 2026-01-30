@@ -1,3 +1,5 @@
+import { User } from "../types/User";
+
 const API_BASE_URL =
   import.meta.env.VITE_API_URL || "http://localhost:3001/api";
 
@@ -9,24 +11,7 @@ export interface ApiResponse<T = any> {
 }
 
 export interface AuthResponse {
-  user: {
-    id: string;
-    email: string;
-    name: string;
-    lastName: string;
-    role: "STUDENT" | "PROFESSOR" | "ADMIN";
-    studentId?: string;
-    professorId?: string;
-    program: string;
-    semester?: number;
-    avatar?: string;
-    enrollmentDate: string;
-    status: "PENDIENTE" | "APROBADO" | "RECHAZADO" | "INACTIVO" | "SUSPENDIDO";
-    gpa?: number;
-    credits?: number;
-    createdAt: string;
-    updatedAt: string;
-  };
+  user: User;
   token: string;
 }
 
@@ -68,9 +53,12 @@ class ApiClient {
     const url = `${this.baseURL}${endpoint}`;
 
     const headers: Record<string, string> = {
-      "Content-Type": "application/json",
       ...((options.headers as Record<string, string>) || {}),
     };
+
+    if (!(options.body instanceof FormData) && !headers["Content-Type"]) {
+      headers["Content-Type"] = "application/json";
+    }
 
     if (this.token) {
       headers.Authorization = `Bearer ${this.token}`;
@@ -90,7 +78,6 @@ class ApiClient {
 
       return data;
     } catch (error) {
-      console.error("API request failed:", error);
       throw error;
     }
   }
@@ -109,17 +96,10 @@ class ApiClient {
     return response.data!;
   }
 
-  async register(userData: {
-    name: string;
-    lastName: string;
-    email: string;
-    password: string;
-    role: "STUDENT" | "PROFESSOR" | "ADMIN";
-    program?: string;
-  }): Promise<AuthResponse> {
+  async register(userData: any): Promise<AuthResponse> {
     const response = await this.request<AuthResponse>("/auth/register", {
       method: "POST",
-      body: JSON.stringify(userData),
+      body: userData instanceof FormData ? userData : JSON.stringify(userData),
     });
 
     if (response.success && response.data) {
@@ -197,6 +177,31 @@ class ApiClient {
     return response.data!;
   }
 
+  async subscribeNewsletter(email: string): Promise<ApiResponse> {
+    return await this.request("/auth/newsletter/subscribe", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    });
+  }
+
+  async submitContactForm(formData: any): Promise<ApiResponse> {
+    return await this.request("/contact/form", {
+      method: "POST",
+      body: JSON.stringify(formData),
+    });
+  }
+
+  async submitChatbotInquiry(data: {
+    nombre: string;
+    email: string;
+    mensaje: string;
+  }): Promise<ApiResponse> {
+    return await this.request("/contact/chatbot", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
   async dropCourse(courseId: string): Promise<void> {
     await this.request(`/courses/${courseId}/enroll`, {
       method: "DELETE",
@@ -246,5 +251,5 @@ class ApiClient {
   }
 }
 
-export const apiClient = new ApiClient(API_BASE_URL);
-export default apiClient;
+export const api = new ApiClient(API_BASE_URL);
+export default api;

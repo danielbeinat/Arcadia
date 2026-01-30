@@ -3,21 +3,7 @@ import { motion } from "framer-motion";
 import { MdCalendarMonth } from "react-icons/md";
 import { FaUserGraduate, FaFlag } from "react-icons/fa6";
 import { GiGraduateCap } from "react-icons/gi";
-
-export interface DegreeItem {
-  id: number;
-  image: string;
-  name: string;
-  Type: string;
-  duration: string;
-  program: string;
-  title?: string;
-  degree?: string;
-  category: string;
-  Time: string;
-  description?: string;
-  date?: string;
-}
+import { Degree as DegreeItem } from "../../types/Degree";
 
 interface DegreeCardProps {
   item: DegreeItem;

@@ -10,18 +10,28 @@ import {
 export class DatabaseService {
   // --- User Methods ---
   static async createUser(userData: any) {
-    // Map role and status to uppercase for Prisma enums
-    const data = {
-      ...userData,
-      role: userData.role
-        ? (userData.role.toUpperCase() as UserRole)
-        : UserRole.STUDENT,
-      status: userData.status
-        ? (userData.status.toUpperCase() as UserStatus)
-        : UserStatus.PENDIENTE,
-    };
+    try {
+      const data = {
+        ...userData,
+        role: userData.role
+          ? (userData.role.toUpperCase() as UserRole)
+          : UserRole.STUDENT,
+        status: userData.status
+          ? (userData.status.toUpperCase() as UserStatus)
+          : UserStatus.PENDIENTE,
+      };
 
-    return await prisma.user.create({ data });
+      console.log("💾 Prisma: Intentando crear usuario con email:", data.email);
+      const user = await prisma.user.create({ data });
+      return user;
+    } catch (error: any) {
+      console.error("❌ Error en DatabaseService.createUser:", {
+        message: error.message,
+        code: error.code,
+        meta: error.meta,
+      });
+      throw error;
+    }
   }
 
   static async findUserByEmail(email: string) {
@@ -106,14 +116,35 @@ export class DatabaseService {
   }
 
   static async activateUser(id: string) {
+    const user = await prisma.user.findUnique({ where: { id } });
+    if (!user) throw new Error("Usuario no encontrado");
+
+    const updateData: any = {
+      status: UserStatus.APROBADO,
+      validationToken: null,
+      tokenExpires: null,
+      updatedAt: new Date(),
+    };
+
+    if (user.role === UserRole.STUDENT && !user.studentId) {
+      const year = new Date().getFullYear();
+      const count = await prisma.user.count({
+        where: {
+          role: UserRole.STUDENT,
+          studentId: { startsWith: year.toString() },
+        },
+      });
+      updateData.studentId = `${year}-${(count + 1).toString().padStart(4, "0")}`;
+    } else if (user.role === UserRole.PROFESSOR && !user.professorId) {
+      const count = await prisma.user.count({
+        where: { role: UserRole.PROFESSOR },
+      });
+      updateData.professorId = `PROF-${(count + 1).toString().padStart(3, "0")}`;
+    }
+
     return await prisma.user.update({
       where: { id },
-      data: {
-        status: UserStatus.APROBADO,
-        validationToken: null,
-        tokenExpires: null,
-        updatedAt: new Date(),
-      },
+      data: updateData,
     });
   }
 
@@ -222,16 +253,15 @@ export class DatabaseService {
     const data = {
       ...degreeData,
       type: degreeData.type
-        ? (degreeData.type.replace("-", "_").toUpperCase() as DegreeType)
-        : DegreeType.ON_CAMPUS,
+        ? (degreeData.type.toUpperCase() as DegreeType)
+        : DegreeType.CARRERA,
     };
     return await prisma.degree.create({ data });
   }
 
   static async updateDegree(id: string, degreeData: any) {
     const data = { ...degreeData };
-    if (data.type)
-      data.type = data.type.replace("-", "_").toUpperCase() as DegreeType;
+    if (data.type) data.type = data.type.toUpperCase() as DegreeType;
 
     return await prisma.degree.update({
       where: { id },
@@ -271,7 +301,7 @@ export class DatabaseService {
 
       if (
         existingEnrollment &&
-        existingEnrollment.status === EnrollmentStatus.ENROLLED
+        existingEnrollment.status === EnrollmentStatus.INSCRITO
       ) {
         throw new Error("El estudiante ya está inscrito en este curso");
       }
@@ -287,10 +317,10 @@ export class DatabaseService {
         create: {
           studentId,
           courseId,
-          status: EnrollmentStatus.ENROLLED,
+          status: EnrollmentStatus.INSCRITO,
         },
         update: {
-          status: EnrollmentStatus.ENROLLED,
+          status: EnrollmentStatus.INSCRITO,
           updatedAt: new Date(),
         },
       });
@@ -317,7 +347,7 @@ export class DatabaseService {
         },
       });
 
-      if (!enrollment || enrollment.status !== EnrollmentStatus.ENROLLED) {
+      if (!enrollment || enrollment.status !== EnrollmentStatus.INSCRITO) {
         return false;
       }
 
@@ -325,7 +355,7 @@ export class DatabaseService {
       await tx.enrollment.update({
         where: { id: enrollment.id },
         data: {
-          status: EnrollmentStatus.DROPPED,
+          status: EnrollmentStatus.RETIRADO,
           updatedAt: new Date(),
         },
       });
@@ -351,7 +381,7 @@ export class DatabaseService {
     const enrollments = await prisma.enrollment.findMany({
       where: {
         studentId,
-        status: EnrollmentStatus.ENROLLED,
+        status: EnrollmentStatus.INSCRITO,
       },
       include: {
         course: {
@@ -370,7 +400,7 @@ export class DatabaseService {
     return await prisma.enrollment.findMany({
       where: {
         courseId,
-        status: EnrollmentStatus.ENROLLED,
+        status: EnrollmentStatus.INSCRITO,
       },
       include: {
         student: true,

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FiMail, FiLock, FiLogIn } from "react-icons/fi";
 import { useAuth } from "../../hooks/useAuth";
@@ -6,20 +6,28 @@ import { useAuth } from "../../hooks/useAuth";
 export const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login, isLoading } = useAuth();
+  const { login, isLoading, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/portal");
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    const success = await login(email, password);
-    if (success) {
-      navigate("/portal");
-    } else {
-      setError("Email o contraseña incorrectos.");
+    try {
+      const success = await login(email, password);
+      if (success) {
+        navigate("/portal");
+      }
+    } catch (err: any) {
+      setError(err.message || "Error al iniciar sesión. Inténtalo de nuevo.");
     }
   };
 
@@ -126,7 +134,7 @@ export const Login: React.FC = () => {
 
           <div className="text-center">
             <Link
-              to="/register"
+              to="/inscripciones"
               className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-500 font-medium transition-colors duration-200"
               onClick={() => window.scrollTo(0, 0)}
             >

@@ -13,9 +13,12 @@ export interface User {
   avatar?: string;
   enrollmentDate?: string;
   createdAt?: string;
-  status: "ACTIVO" | "PENDIENTE" | "RECHAZADO" | "INACTIVO";
+  updatedAt?: string;
+  status: "APROBADO" | "ACTIVO" | "PENDIENTE" | "RECHAZADO" | "INACTIVO" | "SUSPENDIDO";
   gpa?: number;
   credits?: number;
+  dniUrl?: string;
+  degreeUrl?: string;
 }
 
 export interface AuthState {
@@ -38,4 +41,6 @@ export interface RegisterData {
   studentId?: string;
   professorId?: string;
   semester?: number;
+  dniUrl?: string;
+  degreeUrl?: string;
 }
