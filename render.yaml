@@ -3,6 +3,7 @@ services:
     name: academianova-backend
     env: node
     plan: free
+    rootDir: backend
     buildCommand: npm install && npx prisma generate && npm run build
     startCommand: npm start
     healthCheckPath: /health
