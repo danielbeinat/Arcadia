@@ -1,0 +1,137 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String
+  name          String
+  lastName      String
+  role          UserRole
+  studentId     String?   @unique
+  professorId   String?   @unique
+  program       String
+  semester      Int?
+  avatar        String?
+  enrollmentDate DateTime @default(now())
+  status        UserStatus @default(PENDIENTE)
+  validationToken String?
+  tokenExpires   DateTime?
+  gpa           Float?
+  credits       Int?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  enrollments    Enrollment[]
+  teachingCourses Course[] @relation("ProfessorCourses")
+
+  @@map("users")
+}
+
+model Degree {
+  id           String     @id @default(cuid())
+  name         String
+  description  String
+  type         DegreeType
+  duration     Int        // semesters
+  credits      Int
+  faculty      String
+  requirements String[]
+  subjects     String[]
+  isActive     Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  // Relations
+  courses Course[]
+
+  @@map("degrees")
+}
+
+model Course {
+  id            String       @id @default(cuid())
+  code          String       @unique
+  name          String
+  description   String
+  credits       Int
+  semester      Int
+  professorId   String
+  degreeId      String
+  schedule      String
+  classroom     String?
+  maxStudents   Int
+  currentStudents Int        @default(0)
+  status        CourseStatus @default(ACTIVE)
+  prerequisites String[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  // Relations
+  professor     User         @relation("ProfessorCourses", fields: [professorId], references: [id])
+  degree        Degree       @relation(fields: [degreeId], references: [id])
+  enrollments   Enrollment[]
+
+  @@map("courses")
+}
+
+model Enrollment {
+  id            String           @id @default(cuid())
+  studentId     String
+  courseId      String
+  enrollmentDate DateTime         @default(now())
+  status        EnrollmentStatus @default(PENDIENTE)
+  grade         Float?
+  attendance    Float?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  // Relations
+  student       User             @relation(fields: [studentId], references: [id])
+  course        Course           @relation(fields: [courseId], references: [id])
+
+  @@unique([studentId, courseId])
+  @@map("enrollments")
+}
+
+// Enums
+enum UserRole {
+  STUDENT
+  PROFESSOR
+  ADMIN
+}
+
+enum UserStatus {
+  PENDIENTE
+  APROBADO
+  RECHAZADO
+  INACTIVO
+  SUSPENDIDO
+}
+
+enum DegreeType {
+  CARRERA
+  CURSO
+}
+
+enum CourseStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum EnrollmentStatus {
+  PENDIENTE
+  INSCRITO
+  RETIRADO
+  COMPLETADO
+}
