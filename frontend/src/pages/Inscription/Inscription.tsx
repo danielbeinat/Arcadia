@@ -31,44 +31,6 @@ export const Inscription: React.FC = () => {
   const { user, register: authRegister } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
 
-  if (user) {
-    return (
-      <div className="min-h-screen pt-24 pb-12 bg-gray-50 flex items-center justify-center px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center"
-        >
-          <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-10 h-10 text-indigo-600" />
-          </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            ¡Ya eres parte de AcademiaNova!
-          </h2>
-          <p className="text-gray-600 mb-8 text-lg">
-            Ya tienes una cuenta activa y estás registrado en nuestro sistema.
-            No es necesario completar el formulario de inscripción nuevamente.
-          </p>
-          <div className="space-y-4">
-            <button
-              onClick={() => navigate("/dashboard")}
-              className="w-full bg-indigo-600 text-white py-3 px-6 rounded-xl font-semibold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 flex items-center justify-center gap-2"
-            >
-              Ir a mi Panel de Control
-              <ArrowRight className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => navigate("/")}
-              className="w-full bg-white text-gray-600 py-3 px-6 rounded-xl font-semibold border border-gray-200 hover:bg-gray-50 transition-colors"
-            >
-              Volver al Inicio
-            </button>
-          </div>
-        </motion.div>
-      </div>
-    );
-  }
-
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -155,6 +117,44 @@ export const Inscription: React.FC = () => {
       }));
     }
   }, [location.state]);
+
+  if (user) {
+    return (
+      <div className="min-h-screen pt-24 pb-12 bg-gray-50 flex items-center justify-center px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center"
+        >
+          <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <CheckCircle className="w-10 h-10 text-indigo-600" />
+          </div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            ¡Ya eres parte de AcademiaNova!
+          </h2>
+          <p className="text-gray-600 mb-8 text-lg">
+            Ya tienes una cuenta activa y estás registrado en nuestro sistema.
+            No es necesario completar el formulario de inscripción nuevamente.
+          </p>
+          <div className="space-y-4">
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="w-full bg-indigo-600 text-white py-3 px-6 rounded-xl font-semibold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 flex items-center justify-center gap-2"
+            >
+              Ir a mi Panel de Control
+              <ArrowRight className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => navigate("/")}
+              className="w-full bg-white text-gray-600 py-3 px-6 rounded-xl font-semibold border border-gray-200 hover:bg-gray-50 transition-colors"
+            >
+              Volver al Inicio
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
 
   const steps = [
     { number: 1, title: "Tus datos", icon: User },
