@@ -146,7 +146,8 @@ export class DatabaseService {
 
       let nextNumber = 1;
       if (lastStudent && lastStudent.studentId) {
-        const parts = lastStudent.studentId.split("-");
+        const studentIdStr = lastStudent.studentId as string;
+        const parts = studentIdStr.split("-");
         if (parts.length > 1) {
           const lastNumber = parseInt(parts[1]);
           if (!isNaN(lastNumber)) {
@@ -170,7 +171,8 @@ export class DatabaseService {
 
       let nextNumber = 1;
       if (lastProf && lastProf.professorId) {
-        const parts = lastProf.professorId.split("-");
+        const professorIdStr = lastProf.professorId as string;
+        const parts = professorIdStr.split("-");
         if (parts.length > 1) {
           const lastNumber = parseInt(parts[1]);
           if (!isNaN(lastNumber)) {
