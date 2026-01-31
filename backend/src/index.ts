@@ -26,13 +26,9 @@ app.use(
 
 app.use(
   cors({
-    origin: [
-      FRONTEND_URL,
-      "https://arcadia-university.netlify.app",
-      "https://universidad-arcadia.netlify.app",
-    ],
+    origin: "*",
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"],
     allowedHeaders: ["Content-Type", "Authorization"],
   }),
 );
