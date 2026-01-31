@@ -1,45 +1,75 @@
-# AcademiaNova - Plataforma Universitaria Digital
+# AcademiaNova - Plataforma Universitaria Digital 🎓
 
-AcademiaNova es una moderna plataforma de gestión universitaria desarrollada con React y Vite. Ofrece una experiencia integral para estudiantes y profesores, permitiendo la gestión de cursos, visualización de programas académicos y un sistema de autenticación robusto con control de acceso basado en roles.
+AcademiaNova es una plataforma integral de gestión universitaria de nivel profesional, diseñada con una arquitectura Full Stack moderna. Ofrece una solución completa para la administración académica, permitiendo la gestión de usuarios, cursos, programas de estudio y comunicaciones automáticas, todo bajo un entorno seguro y escalable.
 
 ## 🚀 Características Principales
 
-- **Sistema de Autenticación Local**: Registro e inicio de sesión persistente utilizando `localStorage`.
-- **Control de Acceso (RBAC)**: Rutas protegidas para diferentes perfiles (Estudiante, Profesor, Administrador).
-- **Catálogo de Carreras**: Visualización detallada de programas presenciales y virtuales.
-- **Portal del Estudiante**: Dashboard personalizado con información académica y servicios.
-- **Modo Offline**: Soporte básico para funcionamiento sin conexión y sincronización.
-- **Diseño Responsivo**: Interfaz moderna construida con Tailwind CSS y animaciones fluidas.
+- **Gestión de Usuarios (RBAC)**: Sistema de Control de Acceso Basado en Roles para Administradores, Profesores y Estudiantes.
+- **Panel de Administración**: Dashboard avanzado para la aprobación/rechazo de solicitudes de ingreso y gestión de la comunidad educativa.
+- **Autenticación Robusta**: Implementación segura mediante JWT (JSON Web Tokens) y encriptación de contraseñas con Bcrypt.
+- **Comunicaciones Automáticas**: Sistema integrado de envío de emails (Nodemailer) para validación de cuentas y notificaciones de estado académico.
+- **Gestión de Medios**: Integración con Cloudinary para el manejo eficiente de imágenes y activos en la nube.
+- **Experiencia de Usuario (UX)**: Interfaz fluida con animaciones de alto nivel, diseño 100% responsive y soporte PWA (Progressive Web App).
+- **Arquitectura Limpia**: Separación clara de responsabilidades en el backend (Controladores, Servicios, Middlewares) y componentes modulares en el frontend.
 
 ## 🛠️ Tecnologías Utilizadas
 
-- **Frontend**: React 18, TypeScript, Vite.
-- **Estilos**: Tailwind CSS, Framer Motion (animaciones).
-- **Enrutamiento**: React Router Dom v6.
-- **Iconos**: React Icons (Fi, Lu).
-- **Estado**: React Context API para autenticación y notificaciones.
+### **Frontend**
 
+- **React 18** & **Vite**: Biblioteca principal y herramienta de construcción de alto rendimiento.
+- **TypeScript**: Tipado estático para un desarrollo seguro y mantenible.
+- **Tailwind CSS**: Estilizado moderno y eficiente.
+- **Framer Motion**: Animaciones y transiciones avanzadas.
+- **Lucide React**: Iconografía moderna.
 
+### **Backend**
 
-## ⚙️ Instalación y Uso
+- **Node.js** & **Express**: Entorno de ejecución y framework para la API RESTful.
+- **Prisma ORM**: Gestión de base de datos con tipado seguro.
+- **PostgreSQL (Supabase)**: Base de datos relacional escalable.
+- **JWT & Bcrypt**: Seguridad y autenticación.
+- **Nodemailer**: Motor de notificaciones por correo electrónico.
+- **Cloudinary**: Almacenamiento de imágenes en la nube.
 
-1. **Clonar el repositorio**:
-   ```bash
-   git clone <url-del-repositorio>
-   ```
+## 📁 Estructura del Proyecto
 
-2. **Instalar dependencias**:
-   ```bash
-   npm install
-   ```
+El proyecto está organizado en una estructura monorepo simplificada:
 
-3. **Iniciar el servidor de desarrollo**:
-   ```bash
-   npm run dev
-   ```
+- `/frontend`: Aplicación cliente desarrollada con React.
+- `/backend`: Servidor API REST y lógica de negocio.
 
-4. **Construir para producción**:
-   ```bash
-   npm run build
-   ```
+## ⚙️ Instalación y Configuración
 
+### 1. Clonar el repositorio
+
+```bash
+git clone https://github.com/danielbeinat/Arcadia.git
+```
+
+### 2. Configurar el Backend
+
+```bash
+cd backend
+npm install
+# Crear archivo .env basado en la configuración necesaria (DB, JWT, Cloudinary, Email)
+npx prisma generate
+npm run dev
+```
+
+### 3. Configurar el Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+## 🌐 Despliegue
+
+- **Backend**: Desplegado en **Render**.
+- **Frontend**: Desplegado en **Netlify**.
+- **Base de Datos**: Hosteada en **Supabase**.
+
+---
+
+Desarrollado por [Daniel Beinat](https://github.com/danielbeinat) - 2026
