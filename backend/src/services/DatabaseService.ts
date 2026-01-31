@@ -146,9 +146,12 @@ export class DatabaseService {
 
       let nextNumber = 1;
       if (lastStudent && lastStudent.studentId) {
-        const lastNumber = parseInt(lastStudent.studentId.split("-")[1]);
-        if (!isNaN(lastNumber)) {
-          nextNumber = lastNumber + 1;
+        const parts = lastStudent.studentId.split("-");
+        if (parts.length > 1) {
+          const lastNumber = parseInt(parts[1]);
+          if (!isNaN(lastNumber)) {
+            nextNumber = lastNumber + 1;
+          }
         }
       }
 
@@ -167,9 +170,12 @@ export class DatabaseService {
 
       let nextNumber = 1;
       if (lastProf && lastProf.professorId) {
-        const lastNumber = parseInt(lastProf.professorId.split("-")[1]);
-        if (!isNaN(lastNumber)) {
-          nextNumber = lastNumber + 1;
+        const parts = lastProf.professorId.split("-");
+        if (parts.length > 1) {
+          const lastNumber = parseInt(parts[1]);
+          if (!isNaN(lastNumber)) {
+            nextNumber = lastNumber + 1;
+          }
         }
       }
       updateData.professorId = `PROF-${nextNumber.toString().padStart(3, "0")}`;
