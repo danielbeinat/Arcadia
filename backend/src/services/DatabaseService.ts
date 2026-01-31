@@ -119,6 +119,11 @@ export class DatabaseService {
     const user = await prisma.user.findUnique({ where: { id } });
     if (!user) throw new Error("Usuario no encontrado");
 
+    // Si ya está aprobado, simplemente devolver el usuario
+    if (user.status === UserStatus.APROBADO) {
+      return user;
+    }
+
     const updateData: any = {
       status: UserStatus.APROBADO,
       validationToken: null,
@@ -128,18 +133,46 @@ export class DatabaseService {
 
     if (user.role === UserRole.STUDENT && !user.studentId) {
       const year = new Date().getFullYear();
-      const count = await prisma.user.count({
+      // Buscamos el último studentId generado para este año
+      const lastStudent = await prisma.user.findFirst({
         where: {
           role: UserRole.STUDENT,
-          studentId: { startsWith: year.toString() },
+          studentId: { startsWith: `${year}-` },
+        },
+        orderBy: {
+          studentId: "desc",
         },
       });
-      updateData.studentId = `${year}-${(count + 1).toString().padStart(4, "0")}`;
+
+      let nextNumber = 1;
+      if (lastStudent && lastStudent.studentId) {
+        const lastNumber = parseInt(lastStudent.studentId.split("-")[1]);
+        if (!isNaN(lastNumber)) {
+          nextNumber = lastNumber + 1;
+        }
+      }
+
+      updateData.studentId = `${year}-${nextNumber.toString().padStart(4, "0")}`;
     } else if (user.role === UserRole.PROFESSOR && !user.professorId) {
-      const count = await prisma.user.count({
-        where: { role: UserRole.PROFESSOR },
+      // Buscamos el último professorId generado
+      const lastProf = await prisma.user.findFirst({
+        where: {
+          role: UserRole.PROFESSOR,
+          professorId: { startsWith: "PROF-" },
+        },
+        orderBy: {
+          professorId: "desc",
+        },
       });
-      updateData.professorId = `PROF-${(count + 1).toString().padStart(3, "0")}`;
+
+      let nextNumber = 1;
+      if (lastProf && lastProf.professorId) {
+        const lastNumber = parseInt(lastProf.professorId.split("-")[1]);
+        if (!isNaN(lastNumber)) {
+          nextNumber = lastNumber + 1;
+        }
+      }
+      updateData.professorId = `PROF-${nextNumber.toString().padStart(3, "0")}`;
     }
 
     return await prisma.user.update({

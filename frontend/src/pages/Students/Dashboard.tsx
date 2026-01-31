@@ -22,6 +22,7 @@ import {
   GraduationCap,
   MapPin,
   Trophy,
+  Loader2,
 } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import { useEvents } from "../../hooks/useEvents";
@@ -108,7 +109,11 @@ export const Dashboard: React.FC = () => {
     return matchesSearch && matchesRole;
   });
 
+  const [isProcessing, setIsProcessing] = useState<string | null>(null);
+
   const handleApproveUser = async (userId: string) => {
+    if (isProcessing) return;
+    setIsProcessing(userId);
     try {
       await api.approveUser(userId);
       addNotification({
@@ -123,12 +128,16 @@ export const Dashboard: React.FC = () => {
         title: "Error",
         message: "No se pudo aprobar al usuario",
       });
+    } finally {
+      setIsProcessing(null);
     }
   };
 
   const handleRejectUser = async (userId: string) => {
     if (!window.confirm("¿Estás seguro de que deseas rechazar esta solicitud?"))
       return;
+    if (isProcessing) return;
+    setIsProcessing(userId);
     try {
       await api.rejectUser(userId);
       addNotification({
@@ -143,6 +152,8 @@ export const Dashboard: React.FC = () => {
         title: "Error",
         message: "No se pudo rechazar la solicitud",
       });
+    } finally {
+      setIsProcessing(null);
     }
   };
 
@@ -1149,13 +1160,30 @@ export const Dashboard: React.FC = () => {
                         <div className="flex justify-end gap-2">
                           <button
                             onClick={() => handleApproveUser(u.id)}
-                            className="px-4 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-semibold shadow-sm shadow-indigo-200"
+                            disabled={isProcessing === u.id}
+                            className={`px-4 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-semibold shadow-sm shadow-indigo-200 flex items-center gap-2 ${
+                              isProcessing === u.id
+                                ? "opacity-70 cursor-not-allowed"
+                                : ""
+                            }`}
                           >
-                            Aprobar
+                            {isProcessing === u.id ? (
+                              <>
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                Procesando...
+                              </>
+                            ) : (
+                              "Aprobar"
+                            )}
                           </button>
                           <button
                             onClick={() => handleRejectUser(u.id)}
-                            className="px-4 py-1.5 border border-red-200 text-red-600 rounded-lg hover:bg-red-50 transition-colors text-sm font-semibold"
+                            disabled={isProcessing === u.id}
+                            className={`px-4 py-1.5 border border-red-200 text-red-600 rounded-lg hover:bg-red-50 transition-colors text-sm font-semibold ${
+                              isProcessing === u.id
+                                ? "opacity-50 cursor-not-allowed"
+                                : ""
+                            }`}
                           >
                             Rechazar
                           </button>
