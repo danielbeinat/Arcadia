@@ -43,8 +43,10 @@ export class UserController {
 
       const updatedUser = await DatabaseService.activateUser(id);
 
-      // Enviar correo de aprobación
-      await EmailService.sendApprovalEmail(updatedUser.email, updatedUser.name);
+      // Enviar correo de aprobación de forma asíncrona (no bloqueante)
+      EmailService.sendApprovalEmail(updatedUser.email, updatedUser.name).catch(
+        (err) => console.error("Error enviando email de aprobación:", err),
+      );
 
       const { password, ...userWithoutPassword } = updatedUser;
 
@@ -74,11 +76,11 @@ export class UserController {
 
       const updatedUser = await DatabaseService.rejectUser(id);
 
-      // Enviar correo de rechazo
-      await EmailService.sendRejectionEmail(
+      // Enviar correo de rechazo de forma asíncrona (no bloqueante)
+      EmailService.sendRejectionEmail(
         updatedUser.email,
         updatedUser.name,
-      );
+      ).catch((err) => console.error("Error enviando email de rechazo:", err));
 
       const { password, ...userWithoutPassword } = updatedUser;
 
