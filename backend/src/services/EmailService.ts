@@ -61,7 +61,6 @@ export const EmailService = {
       return info;
     } catch (error) {
       console.error("❌ Error enviando correo de bienvenida:", error);
-      // No relanzamos el error para que no bloquee el flujo principal
       return null;
     }
   },
