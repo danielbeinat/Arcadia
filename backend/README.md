@@ -76,18 +76,10 @@ npm start
 
 ## 🔐 Variables de Entorno
 
-```env
-# JWT
-JWT_SECRET=your-super-secret-key
+JWT_SECRET=
 JWT_EXPIRES_IN=7d
-
-# Server
 PORT=3001
-NODE_ENV=development
-
-# CORS
-FRONTEND_URL=http://localhost:5173
-```
+FRONTEND_URL=
 
 ## 🚀 Despliegue en Render
 
@@ -96,9 +88,4 @@ FRONTEND_URL=http://localhost:5173
 3. Configurar variables de entorno en Render
 4. Deploy automático en cada push
 
-## 📝 Notas
 
-- Este backend usa almacenamiento en memoria temporalmente
-- Para producción, configurar Prisma con PostgreSQL
-- Los endpoints están protegidos por autenticación JWT
-- Rate limiting configurado para prevenir abusos
