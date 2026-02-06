@@ -8,6 +8,7 @@ import { NotificationProvider } from "./Components/Notifications/NotificationSys
 import { AuthProvider } from "./hooks/useAuth";
 import { offlineManager } from "./utils/offlineManager";
 import { useEffect } from "react";
+import { api } from "./services/api";
 
 import { ProtectedRoute } from "./Components/Auth/ProtectedRoute";
 
@@ -79,6 +80,9 @@ import { ScrollToTop } from "./Components/ScrollToTop";
 
 export const App: React.FC = () => {
   useEffect(() => {
+    // Silent wake-up call to the backend
+    api.wakeUp();
+
     offlineManager.setupNetworkListeners((status) => {
       console.log("Network status changed:", status);
       if (status === "online") {

@@ -249,6 +249,16 @@ class ApiClient {
     const response = await this.request<any>("/users/stats");
     return response.data!;
   }
+
+  // Health check to wake up the backend
+  async wakeUp(): Promise<void> {
+    try {
+      const healthUrl = this.baseURL.replace("/api", "/health");
+      await fetch(healthUrl, { method: "GET", mode: "no-cors" });
+    } catch (error) {
+      // Silent error as this is just a wake-up call
+    }
+  }
 }
 
 export const api = new ApiClient(API_BASE_URL);
