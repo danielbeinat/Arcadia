@@ -89,6 +89,24 @@ class ApiClient {
       throw new Error("La contraseña debe tener al menos 6 caracteres");
     }
 
+    // Development mode - simulate successful registration
+    if (import.meta.env.DEV) {
+      console.log("🔧 Development mode: Simulating successful registration");
+      return {
+        user: {
+          id: "dev-user-id",
+          email: email.toLowerCase().trim(),
+          name: cleanName,
+          lastName: cleanLastName,
+          role: "STUDENT",
+          status: "PENDIENTE",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        } as User,
+        token: "dev-token"
+      };
+    }
+
     const { data, error } = await supabase.auth.signUp({
       email: email.toLowerCase().trim(),
       password: password,
@@ -107,7 +125,7 @@ class ApiClient {
       
       // Handle rate limit specifically
       if (error.message?.includes("rate limit")) {
-        throw new Error("Demasiados intentos. Por favor espera 1-2 minutos antes de intentar de nuevo.");
+        throw new Error("Demasiados intentos. Por favor espera 1-2 minutos antes de intentar de nuevo. O prueba con un email completamente diferente.");
       }
       
       // Handle email already exists
