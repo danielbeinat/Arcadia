@@ -12,6 +12,7 @@ import { api } from "./services/api";
 
 import { ProtectedRoute } from "./Components/Auth/ProtectedRoute";
 
+
 const Home = lazy(() =>
   import("./pages/Home/Home").then((m) => ({ default: m.Home })),
 );

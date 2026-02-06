@@ -1,3 +1,5 @@
+import { supabase } from "../lib/supabase";
+
 export interface OfflineCourse {
   id: number;
   name: string;
@@ -116,26 +118,17 @@ class OfflineManager {
     if (!navigator.onLine) return "offline";
 
     try {
-      const apiUrl =
-        import.meta.env.VITE_API_URL || "http://localhost:3001/api";
-      const healthUrl = apiUrl.endsWith("/api")
-        ? apiUrl.replace("/api", "/health")
-        : `${apiUrl}/health`;
-
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // Increased to 10s timeout
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
 
       try {
-        const response = await fetch(healthUrl, {
-          method: "GET",
-          mode: "cors",
-          cache: "no-cache",
-          signal: controller.signal,
-        });
-
+        // Use Supabase to check connectivity instead of backend health endpoint
+        const { data, error } = await supabase.auth.getSession();
+        
         clearTimeout(timeoutId);
 
-        if (response.ok) {
+        // If we can reach Supabase (even with no session), we're online
+        if (!error || error.message?.includes('Invalid') || error.message?.includes('not found')) {
           const connection =
             (navigator as any).connection ||
             (navigator as any).mozConnection ||
