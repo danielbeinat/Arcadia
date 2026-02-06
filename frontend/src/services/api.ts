@@ -63,24 +63,37 @@ class ApiClient {
     const cleanName = name?.normalize("NFD").replace(/[\u0300-\u036f]/g, "") || "";
     const cleanLastName = lastName?.normalize("NFD").replace(/[\u0300-\u036f]/g, "") || "";
 
-    // Debug logging
+    // Clean email - remove hidden characters and normalize
+    const cleanEmail = email
+      ?.trim()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")  // Remove diacritics
+      .replace(/\s+/g, '')              // Remove all whitespace
+      .toLowerCase();
+
+    // Debug logging with detailed email analysis
     console.log("Register data:", { 
       email, 
+      cleanEmail,
       password: password ? "***" : "empty", 
       name: cleanName, 
       lastName: cleanLastName,
       originalName: name,
-      originalLastName: lastName
+      originalLastName: lastName,
+      emailLength: email?.length,
+      emailCharCodes: email?.split('').map(c => `${c}(${c.charCodeAt(0)})`),
+      emailTrimmed: email?.trim(),
+      emailTrimmedLength: email?.trim().length
     });
 
     // Validate required fields
-    if (!email || !password) {
+    if (!cleanEmail || !password) {
       throw new Error("Email y contraseña son requeridos");
     }
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!emailRegex.test(cleanEmail)) {
       throw new Error("Formato de email inválido");
     }
 
@@ -95,7 +108,7 @@ class ApiClient {
       return {
         user: {
           id: "dev-user-id",
-          email: email.toLowerCase().trim(),
+          email: cleanEmail,
           name: cleanName,
           lastName: cleanLastName,
           role: "STUDENT",
@@ -108,7 +121,7 @@ class ApiClient {
     }
 
     const { data, error } = await supabase.auth.signUp({
-      email: email.toLowerCase().trim(),
+      email: cleanEmail,
       password: password,
       options: {
         data: {
@@ -141,7 +154,7 @@ class ApiClient {
     // Insert into public.User table
     const insertData = {
       id: data.user.id,
-      email: email?.toLowerCase().trim(),
+      email: cleanEmail,
       name: name,
       lastName: lastName,
       status: "PENDIENTE",
