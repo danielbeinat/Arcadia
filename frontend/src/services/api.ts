@@ -59,8 +59,19 @@ class ApiClient {
       lastName = userData.lastName;
     }
 
+    // Clean names for Supabase Auth (remove special chars)
+    const cleanName = name?.normalize("NFD").replace(/[\u0300-\u036f]/g, "") || "";
+    const cleanLastName = lastName?.normalize("NFD").replace(/[\u0300-\u036f]/g, "") || "";
+
     // Debug logging
-    console.log("Register data:", { email, password: password ? "***" : "empty", name, lastName });
+    console.log("Register data:", { 
+      email, 
+      password: password ? "***" : "empty", 
+      name: cleanName, 
+      lastName: cleanLastName,
+      originalName: name,
+      originalLastName: lastName
+    });
 
     // Validate required fields
     if (!email || !password) {
@@ -81,6 +92,12 @@ class ApiClient {
     const { data, error } = await supabase.auth.signUp({
       email: email.toLowerCase().trim(),
       password: password,
+      options: {
+        data: {
+          name: cleanName,
+          last_name: cleanLastName
+        }
+      }
     });
 
     console.log("Supabase response:", { data, error });
