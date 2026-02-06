@@ -59,12 +59,36 @@ class ApiClient {
       lastName = userData.lastName;
     }
 
+    // Debug logging
+    console.log("Register data:", { email, password: password ? "***" : "empty", name, lastName });
+
+    // Validate required fields
+    if (!email || !password) {
+      throw new Error("Email y contraseña son requeridos");
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      throw new Error("Formato de email inválido");
+    }
+
+    // Validate password
+    if (password.length < 6) {
+      throw new Error("La contraseña debe tener al menos 6 caracteres");
+    }
+
     const { data, error } = await supabase.auth.signUp({
-      email: email?.toLowerCase().trim(),
+      email: email.toLowerCase().trim(),
       password: password,
     });
 
-    if (error) throw error;
+    console.log("Supabase response:", { data, error });
+
+    if (error) {
+      console.error("Supabase auth error:", error);
+      throw error;
+    }
 
     if (!data.user) throw new Error("Registration failed");
 
