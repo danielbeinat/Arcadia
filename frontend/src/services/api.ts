@@ -44,13 +44,24 @@ class ApiClient {
   }
 
   async register(userData: any): Promise<AuthResponse> {
-    // Note: Registration in the original backend was complex (email domain validation, file uploads, etc.)
-    // For now, we'll implement a direct registration.
-    // File uploads to Cloudinary would need to be handled separately or moved to Supabase Storage.
+    // Handle FormData or object input
+    let email: string, password: string, name: string, lastName: string;
+    
+    if (userData instanceof FormData) {
+      email = userData.get("email") as string;
+      password = userData.get("password") as string;
+      name = userData.get("name") as string;
+      lastName = userData.get("lastName") as string;
+    } else {
+      email = userData.email;
+      password = userData.password;
+      name = userData.name;
+      lastName = userData.lastName;
+    }
 
     const { data, error } = await supabase.auth.signUp({
-      email: userData.email,
-      password: userData.password,
+      email: email?.toLowerCase().trim(),
+      password: password,
     });
 
     if (error) throw error;
@@ -58,20 +69,49 @@ class ApiClient {
     if (!data.user) throw new Error("Registration failed");
 
     // Insert into public.User table
-    const { password, ...insertData } = userData;
+    const insertData = {
+      id: data.user.id,
+      email: email?.toLowerCase().trim(),
+      name: name,
+      lastName: lastName,
+      status: "PENDIENTE",
+      role: "STUDENT",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    // Add additional fields if they exist in FormData
+    if (userData instanceof FormData) {
+      const country = userData.get("country");
+      const docType = userData.get("docType");
+      const docNumber = userData.get("docNumber");
+      const nationality = userData.get("nationality");
+      const phoneType = userData.get("phoneType");
+      const phonePrefix = userData.get("phonePrefix");
+      const phoneArea = userData.get("phoneArea");
+      const phoneNumber = userData.get("phoneNumber");
+      const degree = userData.get("degree");
+      const programType = userData.get("programType");
+      const program = userData.get("program");
+      const startPeriod = userData.get("startPeriod");
+
+      if (country) Object.assign(insertData, { country });
+      if (docType) Object.assign(insertData, { docType });
+      if (docNumber) Object.assign(insertData, { docNumber });
+      if (nationality) Object.assign(insertData, { nationality });
+      if (phoneType) Object.assign(insertData, { phoneType });
+      if (phonePrefix) Object.assign(insertData, { phonePrefix });
+      if (phoneArea) Object.assign(insertData, { phoneArea });
+      if (phoneNumber) Object.assign(insertData, { phoneNumber });
+      if (degree) Object.assign(insertData, { degree });
+      if (programType) Object.assign(insertData, { programType });
+      if (program) Object.assign(insertData, { program });
+      if (startPeriod) Object.assign(insertData, { startPeriod });
+    }
+
     const { data: newUserData, error: insertError } = await supabase
       .from("User")
-      .insert([
-        {
-          ...insertData,
-          id: data.user.id,
-          email: userData.email.toLowerCase().trim(),
-          status: "PENDIENTE",
-          role: userData.role || "STUDENT",
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-      ])
+      .insert([insertData])
       .select()
       .single();
 
