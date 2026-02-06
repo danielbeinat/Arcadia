@@ -104,6 +104,17 @@ class ApiClient {
 
     if (error) {
       console.error("Supabase auth error:", error);
+      
+      // Handle rate limit specifically
+      if (error.message?.includes("rate limit")) {
+        throw new Error("Demasiados intentos. Por favor espera 1-2 minutos antes de intentar de nuevo.");
+      }
+      
+      // Handle email already exists
+      if (error.message?.includes("already registered")) {
+        throw new Error("Este email ya está registrado. Intenta con otro email o inicia sesión.");
+      }
+      
       throw error;
     }
 
