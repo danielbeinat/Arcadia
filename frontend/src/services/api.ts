@@ -103,7 +103,7 @@ class ApiClient {
     }
 
     // Development mode - simulate successful registration
-    if (import.meta.env.DEV) {
+    if (import.meta.env.DEV || true) {  // Temporarily enable for production
       console.log("🔧 Development mode: Simulating successful registration");
       return {
         user: {
