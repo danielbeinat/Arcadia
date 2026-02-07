@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { supabase } from "../../lib/supabase";
 import {
   User,
   Mail,
@@ -195,7 +196,7 @@ export const Inscription: React.FC = () => {
     }
   };
 
-  const handleNextStep = (e: React.FormEvent) => {
+  const handleNextStep = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
@@ -248,6 +249,37 @@ export const Inscription: React.FC = () => {
         setError("El número de DNI debe ser de exactamente 8 dígitos.");
         return;
       }
+
+      // Validar si el email ya existe
+      const checkEmailExists = async () => {
+        try {
+          // Para usuarios no autenticados, usamos una función RPC o permitimos lectura pública
+          const { data, error } = await supabase
+            .from("users")
+            .select("email")
+            .eq("email", formData.email);
+          
+          if (error && error.code === '401') {
+            // Si no hay permisos, permitimos continuar (validación al final)
+            console.log("No se puede validar email ahora, se validará al final");
+            return true;
+          }
+          
+          if (data && data.length > 0) {
+            setError("Este email ya está registrado. Por favor usa otro email.");
+            return false;
+          }
+          return true;
+        } catch (err) {
+          // Si hay cualquier error, permitimos continuar
+          console.log("Error en validación de email, continuando:", err);
+          return true;
+        }
+      };
+
+      // Esperar validación de email antes de continuar
+      const emailValid = await checkEmailExists();
+      if (!emailValid) return;
     }
 
     if (currentStep < 3) {

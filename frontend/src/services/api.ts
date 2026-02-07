@@ -28,9 +28,9 @@ class ApiClient {
 
     if (error) throw error;
 
-    // Fetch user profile from public.User table
+    // Fetch user profile from public.users table
     const { data: userData, error: userError } = await supabase
-      .from("User")
+      .from("users")
       .select("*")
       .eq("email", email)
       .single();
@@ -44,38 +44,160 @@ class ApiClient {
   }
 
   async register(userData: any): Promise<AuthResponse> {
-    // Note: Registration in the original backend was complex (email domain validation, file uploads, etc.)
-    // For now, we'll implement a direct registration.
-    // File uploads to Cloudinary would need to be handled separately or moved to Supabase Storage.
+    // Handle FormData or object input
+    let email: string, password: string, name: string, lastName: string;
+    let dniFile: File | null = null;
+    let degreeFile: File | null = null;
 
+    if (userData instanceof FormData) {
+      email = userData.get("email") as string;
+      password = userData.get("password") as string;
+      name = userData.get("name") as string;
+      lastName = userData.get("lastName") as string;
+      dniFile = userData.get("dniUrl") as File;
+      degreeFile = userData.get("degreeUrl") as File;
+    } else {
+      email = userData.email;
+      password = userData.password;
+      name = userData.name;
+      lastName = userData.lastName;
+    }
+
+    // Clean names for Supabase Auth (remove special chars)
+    const cleanName =
+      name?.normalize("NFD").replace(/[\u0300-\u036f]/g, "") || "";
+    const cleanLastName =
+      lastName?.normalize("NFD").replace(/[\u0300-\u036f]/g, "") || "";
+
+    // Clean email - more thorough sanitization
+    const cleanEmail = email?.trim().toLowerCase() || "";
+    console.log("Original email:", `"${email}"`);
+    console.log("Cleaned email:", `"${cleanEmail}"`);
+
+    // Validate email format manually before sending to Supabase
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(cleanEmail)) {
+      throw new Error(`Email inválido: "${cleanEmail}"`);
+    }
+
+    // Validate required fields
+    if (!cleanEmail || !password) {
+      throw new Error("Email y contraseña son requeridos");
+    }
+
+    // Let Supabase handle email validation
+    // Validate password
+    if (password.length < 6) {
+      throw new Error("La contraseña debe tener al menos 6 caracteres");
+    }
+
+    // Upload files to Supabase Storage if present
+    let dniUrl = "";
+    let degreeUrl = "";
+
+    if (dniFile) {
+      const fileExt = dniFile.name.split(".").pop();
+      const fileName = `dni_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+      dniUrl = await this.uploadFile(dniFile, "documents", `dni/${fileName}`);
+    }
+
+    if (degreeFile) {
+      const fileExt = degreeFile.name.split(".").pop();
+      const fileName = `degree_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+      degreeUrl = await this.uploadFile(
+        degreeFile,
+        "documents",
+        `degrees/${fileName}`,
+      );
+    }
+
+    // Use Supabase Auth for real registration
     const { data, error } = await supabase.auth.signUp({
-      email: userData.email,
-      password: userData.password,
+      email: cleanEmail,
+      password: password,
     });
 
-    if (error) throw error;
+    console.log("Supabase response:", { data, error });
+
+    if (error) {
+      console.error("Supabase auth error:", error);
+
+      // Handle rate limit specifically
+      if (error.message?.includes("rate limit")) {
+        throw new Error(
+          "Demasiados intentos. Por favor espera 1-2 minutos antes de intentar de nuevo. O prueba con un email completamente diferente.",
+        );
+      }
+
+      // Handle email already exists
+      if (error.message?.includes("already registered")) {
+        throw new Error(
+          "Este email ya está registrado. Intenta con otro email o inicia sesión.",
+        );
+      }
+
+      throw error;
+    }
 
     if (!data.user) throw new Error("Registration failed");
 
-    // Insert into public.User table
-    const { password, ...insertData } = userData;
+    // Insert into public.users table (PostgreSQL uses lowercase for these column names)
+    const insertData: any = {
+      id: data.user.id,
+      email: cleanEmail,
+      name: name,
+      lastName: lastName,
+      status: "PENDIENTE",
+      role: "STUDENT",
+      createdat: new Date().toISOString(),
+      updatedat: new Date().toISOString(),
+    };
+
+    // Add document URLs if uploaded
+    if (dniUrl) insertData.dniurl = dniUrl;
+    if (degreeUrl) insertData.degreeurl = degreeUrl;
+
+    // Add additional fields if they exist in FormData
+    if (userData instanceof FormData) {
+      const country = userData.get("country");
+      const docType = userData.get("docType");
+      const docNumber = userData.get("docNumber");
+      const nationality = userData.get("nationality");
+      const phoneType = userData.get("phoneType");
+      const phonePrefix = userData.get("phonePrefix");
+      const phoneArea = userData.get("phoneArea");
+      const phoneNumber = userData.get("phoneNumber");
+      const degree = userData.get("degree");
+      const programType = userData.get("programType");
+      const program = userData.get("program");
+      const startPeriod = userData.get("startPeriod");
+
+      if (country) insertData.country = country;
+      if (docType) insertData.doctype = docType;
+      if (docNumber) insertData.docnumber = docNumber;
+      if (nationality) insertData.nationality = nationality;
+      if (phoneType) insertData.phonetype = phoneType;
+      if (phonePrefix) insertData.phoneprefix = phonePrefix;
+      if (phoneArea) insertData.phonearea = phoneArea;
+      if (phoneNumber) insertData.phonenumber = phoneNumber;
+      if (degree) insertData.degree = degree;
+      if (programType) insertData.programtype = programType;
+      if (program) insertData.program = program;
+      if (startPeriod) insertData.startperiod = startPeriod;
+    }
+
+    console.log("Inserting into public.users table with data:", insertData);
+
     const { data: newUserData, error: insertError } = await supabase
-      .from("User")
-      .insert([
-        {
-          ...insertData,
-          id: data.user.id,
-          email: userData.email.toLowerCase().trim(),
-          status: "PENDIENTE",
-          role: userData.role || "STUDENT",
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-      ])
+      .from("users")
+      .insert([insertData])
       .select()
       .single();
 
-    if (insertError) throw insertError;
+    if (insertError) {
+      console.error("Insert error details:", insertError);
+      throw insertError;
+    }
 
     return {
       user: newUserData as User,
@@ -96,12 +218,15 @@ class ApiClient {
     if (!user) throw new Error("Not authenticated");
 
     const { data: userData, error } = await supabase
-      .from("User")
+      .from("users")
       .select("*")
       .eq("id", user.id)
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error("getProfile error:", error);
+      throw error;
+    }
     return userData as User;
   }
 
@@ -112,7 +237,7 @@ class ApiClient {
     if (!user) throw new Error("Not authenticated");
 
     const { data, error } = await supabase
-      .from("User")
+      .from("users")
       .update({
         ...userData,
         updatedAt: new Date().toISOString(),
@@ -275,76 +400,105 @@ class ApiClient {
   // Admin endpoints
   async getUsers(): Promise<any[]> {
     const { data, error } = await supabase
-      .from("User")
+      .from("users")
       .select("*")
-      .order("createdAt", { ascending: false });
+      .order("createdat", { ascending: false });
 
     if (error) throw error;
     return data;
   }
 
   async getPendingUsers(): Promise<User[]> {
-    const { data, error } = await supabase
-      .from("User")
-      .select("*")
-      .eq("status", "PENDIENTE")
-      .order("createdAt", { ascending: false });
+    try {
+      // Query más básico posible - sin orden
+      const { data, error } = await supabase
+        .from("users")
+        .select("*")
+        .limit(10); // Limitar a 10 para pruebas
 
-    if (error) throw error;
-    return data as User[];
+      if (error) {
+        console.error("getPendingUsers error:", error);
+        throw error;
+      }
+      
+      console.log("Usuarios obtenidos:", data);
+      
+      // Filtrar usuarios pendientes en el frontend
+      const pendingUsers = data.filter((user: any) => user.status === "PENDIENTE");
+      console.log("Usuarios pendientes:", pendingUsers);
+      
+      return pendingUsers as User[];
+    } catch (err) {
+      console.error("Error completo en getPendingUsers:", err);
+      throw err;
+    }
   }
 
   async approveUser(userId: string): Promise<User> {
-    const { data, error } = await supabase
-      .from("User")
-      .update({
-        status: "APROBADO",
-        updatedAt: new Date().toISOString(),
-      })
-      .eq("id", userId)
-      .select()
-      .single();
+    console.log("Aprobando usuario con ID:", userId);
+    
+    try {
+      const { data, error } = await supabase
+        .from("users")
+        .update({
+          status: "APROBADO",
+          updatedat: new Date().toISOString(),
+        })
+        .match({ id: userId }) // Usar match en lugar de in/eq
+        .select(); // Quitar .single()
 
-    if (error) throw error;
-    return data as User;
+      if (error) {
+        console.error("approveUser error:", error);
+        throw error;
+      }
+      
+      console.log("Usuario aprobado:", data);
+      return data[0] as User; // Retornar primer elemento
+    } catch (err) {
+      console.error("Error completo en approveUser:", err);
+      throw err;
+    }
   }
 
   async rejectUser(userId: string): Promise<User> {
     const { data, error } = await supabase
-      .from("User")
+      .from("users")
       .update({
         status: "RECHAZADO",
-        updatedAt: new Date().toISOString(),
+        updatedat: new Date().toISOString(),
       })
-      .eq("id", userId)
+      .in("id", [userId])
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error("rejectUser error:", error);
+      throw error;
+    }
     return data as User;
   }
 
   async getUserStats(): Promise<any> {
     // This is more complex in Supabase without edge functions, but we can do multiple counts
     const { count: total } = await supabase
-      .from("User")
+      .from("users")
       .select("*", { count: "exact", head: true });
     const { count: students } = await supabase
-      .from("User")
+      .from("users")
       .select("*", { count: "exact", head: true })
-      .eq("role", "STUDENT");
+      .in("role", ["STUDENT"]);
     const { count: professors } = await supabase
-      .from("User")
+      .from("users")
       .select("*", { count: "exact", head: true })
-      .eq("role", "PROFESSOR");
+      .in("role", ["PROFESSOR"]);
     const { count: admins } = await supabase
-      .from("User")
+      .from("users")
       .select("*", { count: "exact", head: true })
-      .eq("role", "ADMIN");
+      .in("role", ["ADMIN"]);
     const { count: active } = await supabase
-      .from("User")
+      .from("users")
       .select("*", { count: "exact", head: true })
-      .eq("status", "APROBADO");
+      .in("status", ["APROBADO"]);
 
     return {
       total,
@@ -353,6 +507,28 @@ class ApiClient {
       admins,
       active,
     };
+  }
+
+  async uploadFile(file: File, bucket: string, path: string): Promise<string> {
+    // Direct upload without bucket creation (assume bucket exists)
+    const { data, error } = await supabase.storage
+      .from(bucket)
+      .upload(path, file, {
+        cacheControl: "3600",
+        upsert: false,
+      });
+
+    if (error) {
+      console.error("Upload error:", error);
+      throw new Error(`Error al subir archivo: ${error.message}`);
+    }
+
+    // Get public URL
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from(bucket).getPublicUrl(data.path);
+
+    return publicUrl;
   }
 
   async wakeUp(): Promise<void> {

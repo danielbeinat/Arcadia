@@ -9,9 +9,8 @@ import { AuthProvider } from "./hooks/useAuth";
 import { offlineManager } from "./utils/offlineManager";
 import { useEffect } from "react";
 import { api } from "./services/api";
-
+import { TestSupabase } from "./components/TestSupabase/TestSupabase";
 import { ProtectedRoute } from "./Components/Auth/ProtectedRoute";
-
 
 const Home = lazy(() =>
   import("./pages/Home/Home").then((m) => ({ default: m.Home })),

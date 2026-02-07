@@ -44,3 +44,5 @@ export interface RegisterData {
   dniUrl?: string;
   degreeUrl?: string;
 }
+
+export type RegisterInput = RegisterData | FormData;
