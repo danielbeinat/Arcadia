@@ -9,6 +9,7 @@ export interface RawDegree {
   degree?: string;
   category: string;
   Time: string;
+  subjects?: { semester: number; name: string }[];
 }
 
 export interface Degree {

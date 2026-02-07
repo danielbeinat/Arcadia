@@ -44,157 +44,34 @@ class ApiClient {
   }
 
   async register(userData: any): Promise<AuthResponse> {
-    // Handle FormData or object input
-    let email: string, password: string, name: string, lastName: string;
-    
-    if (userData instanceof FormData) {
-      email = userData.get("email") as string;
-      password = userData.get("password") as string;
-      name = userData.get("name") as string;
-      lastName = userData.get("lastName") as string;
-    } else {
-      email = userData.email;
-      password = userData.password;
-      name = userData.name;
-      lastName = userData.lastName;
-    }
-
-    // Clean names for Supabase Auth (remove special chars)
-    const cleanName = name?.normalize("NFD").replace(/[\u0300-\u036f]/g, "") || "";
-    const cleanLastName = lastName?.normalize("NFD").replace(/[\u0300-\u036f]/g, "") || "";
-
-    // Clean email - remove hidden characters and normalize
-    const cleanEmail = email
-      ?.trim()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")  // Remove diacritics
-      .replace(/\s+/g, '')              // Remove all whitespace
-      .toLowerCase();
-
-    // Debug logging with detailed email analysis
-    console.log("Register data:", { 
-      email, 
-      cleanEmail,
-      password: password ? "***" : "empty", 
-      name: cleanName, 
-      lastName: cleanLastName,
-      originalName: name,
-      originalLastName: lastName,
-      emailLength: email?.length,
-      emailCharCodes: email?.split('').map(c => `${c}(${c.charCodeAt(0)})`),
-      emailTrimmed: email?.trim(),
-      emailTrimmedLength: email?.trim().length
-    });
-
-    // Validate required fields
-    if (!cleanEmail || !password) {
-      throw new Error("Email y contraseña son requeridos");
-    }
-
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(cleanEmail)) {
-      throw new Error("Formato de email inválido");
-    }
-
-    // Validate password
-    if (password.length < 6) {
-      throw new Error("La contraseña debe tener al menos 6 caracteres");
-    }
-
-    // Development mode - simulate successful registration
-    if (import.meta.env.DEV || true) {  // Temporarily enable for production
-      console.log("🔧 Development mode: Simulating successful registration");
-      return {
-        user: {
-          id: "dev-user-id",
-          email: cleanEmail,
-          name: cleanName,
-          lastName: cleanLastName,
-          role: "STUDENT",
-          status: "PENDIENTE",
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        } as User,
-        token: "dev-token"
-      };
-    }
+    // Note: Registration in the original backend was complex (email domain validation, file uploads, etc.)
+    // For now, we'll implement a direct registration.
+    // File uploads to Cloudinary would need to be handled separately or moved to Supabase Storage.
 
     const { data, error } = await supabase.auth.signUp({
-      email: cleanEmail,
-      password: password,
-      options: {
-        data: {
-          name: cleanName,
-          last_name: cleanLastName
-        }
-      }
+      email: userData.email,
+      password: userData.password,
     });
 
-    console.log("Supabase response:", { data, error });
-
-    if (error) {
-      console.error("Supabase auth error:", error);
-      
-      // Handle rate limit specifically
-      if (error.message?.includes("rate limit")) {
-        throw new Error("Demasiados intentos. Por favor espera 1-2 minutos antes de intentar de nuevo. O prueba con un email completamente diferente.");
-      }
-      
-      // Handle email already exists
-      if (error.message?.includes("already registered")) {
-        throw new Error("Este email ya está registrado. Intenta con otro email o inicia sesión.");
-      }
-      
-      throw error;
-    }
+    if (error) throw error;
 
     if (!data.user) throw new Error("Registration failed");
 
     // Insert into public.User table
-    const insertData = {
-      id: data.user.id,
-      email: cleanEmail,
-      name: name,
-      lastName: lastName,
-      status: "PENDIENTE",
-      role: "STUDENT",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    // Add additional fields if they exist in FormData
-    if (userData instanceof FormData) {
-      const country = userData.get("country");
-      const docType = userData.get("docType");
-      const docNumber = userData.get("docNumber");
-      const nationality = userData.get("nationality");
-      const phoneType = userData.get("phoneType");
-      const phonePrefix = userData.get("phonePrefix");
-      const phoneArea = userData.get("phoneArea");
-      const phoneNumber = userData.get("phoneNumber");
-      const degree = userData.get("degree");
-      const programType = userData.get("programType");
-      const program = userData.get("program");
-      const startPeriod = userData.get("startPeriod");
-
-      if (country) Object.assign(insertData, { country });
-      if (docType) Object.assign(insertData, { docType });
-      if (docNumber) Object.assign(insertData, { docNumber });
-      if (nationality) Object.assign(insertData, { nationality });
-      if (phoneType) Object.assign(insertData, { phoneType });
-      if (phonePrefix) Object.assign(insertData, { phonePrefix });
-      if (phoneArea) Object.assign(insertData, { phoneArea });
-      if (phoneNumber) Object.assign(insertData, { phoneNumber });
-      if (degree) Object.assign(insertData, { degree });
-      if (programType) Object.assign(insertData, { programType });
-      if (program) Object.assign(insertData, { program });
-      if (startPeriod) Object.assign(insertData, { startPeriod });
-    }
-
+    const { password, ...insertData } = userData;
     const { data: newUserData, error: insertError } = await supabase
       .from("User")
-      .insert([insertData])
+      .insert([
+        {
+          ...insertData,
+          id: data.user.id,
+          email: userData.email.toLowerCase().trim(),
+          status: "PENDIENTE",
+          role: userData.role || "STUDENT",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      ])
       .select()
       .single();
 

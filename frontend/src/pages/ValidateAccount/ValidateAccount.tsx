@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { CheckCircle, XCircle, Loader2, ArrowRight } from "lucide-react";
-import { supabase } from "../../lib/supabase";
 
 export const ValidateAccount: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -20,33 +19,19 @@ export const ValidateAccount: React.FC = () => {
       }
 
       try {
-        // Use the token as an access token to get user info
-        const { data, error } = await supabase.auth.getUser(token);
+        const response = await fetch(`http://localhost:3001/api/auth/validate?token=${token}`);
+        const data = await response.json();
 
-        if (error) {
-          setStatus("error");
-          setMessage(error.message || "Token inválido o expirado.");
-        } else if (data.user) {
-          // Update user status to approved in the database
-          const { error: updateError } = await supabase
-            .from("User")
-            .update({ status: "APROBADO" })
-            .eq("id", data.user.id);
-
-          if (updateError) {
-            setStatus("error");
-            setMessage("Error al actualizar el estado de la cuenta.");
-          } else {
-            setStatus("success");
-            setMessage("¡Cuenta validada exitosamente!");
-          }
+        if (response.ok) {
+          setStatus("success");
+          setMessage(data.message || "¡Cuenta validada exitosamente!");
         } else {
           setStatus("error");
-          setMessage("No se pudo validar el token.");
+          setMessage(data.message || "Error al validar la cuenta.");
         }
       } catch (error) {
         setStatus("error");
-        setMessage("No se pudo validar el token.");
+        setMessage("No se pudo conectar con el servidor.");
       }
     };
 
