@@ -62,6 +62,8 @@ import api from "../../services/api";
 
 import { AllDegrees } from "../../assets/AllDegrees/AllDegrees";
 
+import { DocumentModal } from "../../Components/DocumentViewer/DocumentModal";
+
 
 
 export const Dashboard: React.FC = () => {
@@ -117,6 +119,11 @@ export const Dashboard: React.FC = () => {
     "ALL",
 
   );
+
+  const [documentModal, setDocumentModal] = useState<{
+    title: string;
+    url: string;
+  } | null>(null);
 
 
 
@@ -2180,7 +2187,7 @@ export const Dashboard: React.FC = () => {
 
                             <p className="text-[10px] font-mono text-indigo-600 mt-1">
 
-                              ID: {u.studentId || u.professorId || "N/A"}
+                              ID: {(u as any).studentid ?? u.studentId ?? (u as any).professorid ?? u.professorId ?? "—"}
 
                             </p>
 
@@ -2201,13 +2208,9 @@ export const Dashboard: React.FC = () => {
                           </p>
 
                           {u.role === "STUDENT" && (
-
                             <p className="text-xs text-gray-500">
-
-                              {u.semester}° Semestre
-
+                              {u.semester != null ? `${u.semester}° Semestre` : "—"}
                             </p>
-
                           )}
 
                         </div>
@@ -2246,7 +2249,12 @@ export const Dashboard: React.FC = () => {
 
                           <Calendar className="w-3.5 h-3.5" />
 
-                          {new Date(u.createdAt || "").toLocaleDateString()}
+                          {(() => {
+                            const raw = (u as any).createdat ?? (u as any).created_at ?? u.createdAt;
+                            if (!raw) return "—";
+                            const d = new Date(raw);
+                            return isNaN(d.getTime()) ? "—" : d.toLocaleDateString();
+                          })()}
 
                         </div>
 
@@ -2256,51 +2264,47 @@ export const Dashboard: React.FC = () => {
 
                         <div className="flex gap-2">
 
-                          {u.dniUrl && (
+                          {((u as any).dniurl ?? u.dniUrl) && (
 
-                            <a
+                            <button
 
-                              href={getSecureUrl(u.dniUrl)}
-
-                              target="_blank"
-
-                              rel="noopener noreferrer"
-
+                              onClick={() =>
+                                setDocumentModal({
+                                  title: "Documento de Identidad (DNI)",
+                                  url: ((u as any).dniurl ?? u.dniUrl)!,
+                                })
+                              }
                               className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
-
                               title="Ver DNI"
-
                             >
 
                               <CreditCard size={16} />
 
-                            </a>
+                            </button>
 
                           )}
 
-                          {u.degreeUrl && (
+                          {((u as any).degreeurl ?? u.degreeUrl) && (
 
-                            <a
+                            <button
 
-                              href={getSecureUrl(u.degreeUrl)}
-
-                              target="_blank"
-
-                              rel="noopener noreferrer"
-
+                              onClick={() =>
+                                setDocumentModal({
+                                  title: "Analítico / Título Universitario",
+                                  url: ((u as any).degreeurl ?? u.degreeUrl)!,
+                                })
+                              }
                               className="p-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition-colors"
-
-                              title="Ver Título"
-
+                              title="Ver Analítico"
                             >
 
                               <FileText size={16} />
 
-                            </a>
+                            </button>
 
                           )}
 
-                          {!u.dniUrl && !u.degreeUrl && (
+                          {!((u as any).dniurl ?? u.dniUrl) && !((u as any).degreeurl ?? u.degreeUrl) && (
 
                             <span className="text-[10px] text-gray-400 italic">
 
@@ -2421,6 +2425,14 @@ export const Dashboard: React.FC = () => {
           )}
 
         </div>
+
+        {documentModal && (
+          <DocumentModal
+            title={documentModal.title}
+            url={documentModal.url}
+            onClose={() => setDocumentModal(null)}
+          />
+        )}
 
       </motion.div>
 

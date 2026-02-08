@@ -309,6 +309,20 @@ export const Inscription: React.FC = () => {
         throw new Error("Por favor sube todos los documentos requeridos.");
       }
 
+      const { inscriptionSchema } = await import("../../lib/validation");
+      const result = inscriptionSchema.safeParse({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
+        program: formData.program || "Sin programa",
+      });
+      if (!result.success) {
+        const msg = result.error.errors[0]?.message ?? "Revisa los datos del formulario";
+        throw new Error(msg);
+      }
+
       const formDataToSend = new FormData();
 
       formDataToSend.append("email", formData.email);

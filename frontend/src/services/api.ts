@@ -1,6 +1,28 @@
 import { supabase } from "../lib/supabase";
 import { User } from "../types/User";
 
+/** Normaliza objeto usuario de Supabase (snake_case) a camelCase para el frontend */
+function normalizeUser(row: Record<string, unknown> | null): User | null {
+  if (!row) return null;
+  return {
+    ...row,
+    name: (row.name ?? "") as string,
+    lastName: (row.lastname ?? row.lastName ?? "") as string,
+    studentId: (row.studentid ?? row.studentId) as string | undefined,
+    professorId: (row.professorid ?? row.professorId) as string | undefined,
+    dniUrl: (row.dniurl ?? row.dniUrl) as string | undefined,
+    degreeUrl: (row.degreeurl ?? row.degreeUrl) as string | undefined,
+    createdAt: (row.createdat ?? row.created_at ?? row.createdAt) as
+      | string
+      | undefined,
+    updatedAt: (row.updatedat ?? row.updatedAt) as string | undefined,
+    enrollmentDate: (row.enrollmentdate ?? row.enrollmentDate) as
+      | string
+      | undefined,
+    semester: (row.semester ?? undefined) as number | undefined,
+  } as User;
+}
+
 export interface ApiResponse<T = any> {
   success: boolean;
   data?: T;
@@ -28,7 +50,6 @@ class ApiClient {
 
     if (error) throw error;
 
-    // Fetch user profile from public.users table
     const { data: userData, error: userError } = await supabase
       .from("users")
       .select("*")
@@ -38,8 +59,9 @@ class ApiClient {
     if (userError) throw userError;
 
     return {
-      user: userData as User,
-      token: data.session.access_token,
+      user: normalizeUser(userData),
+      token: data.session?.access_token || "",
+      refreshToken: data.session?.refresh_token || "",
     };
   }
 
@@ -199,8 +221,11 @@ class ApiClient {
       throw insertError;
     }
 
+    const user = normalizeUser(newUserData);
+    if (!user) throw new Error("Error al crear el perfil");
+
     return {
-      user: newUserData as User,
+      user,
       token: data.session?.access_token || "",
     };
   }
@@ -221,13 +246,15 @@ class ApiClient {
       .from("users")
       .select("*")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     if (error) {
       console.error("getProfile error:", error);
       throw error;
     }
-    return userData as User;
+    const profile = normalizeUser(userData);
+    if (!profile) throw new Error("Perfil no encontrado en la base de datos");
+    return profile;
   }
 
   async updateProfile(userData: Partial<User>): Promise<User> {
@@ -240,14 +267,16 @@ class ApiClient {
       .from("users")
       .update({
         ...userData,
-        updatedAt: new Date().toISOString(),
+        updatedat: new Date().toISOString(),
       })
       .eq("id", user.id)
       .select()
       .single();
 
     if (error) throw error;
-    return data as User;
+    const updated = normalizeUser(data);
+    if (!updated) throw new Error("Error al actualizar el perfil");
+    return updated;
   }
 
   async updatePassword(
@@ -420,14 +449,16 @@ class ApiClient {
         console.error("getPendingUsers error:", error);
         throw error;
       }
-      
+
       console.log("Usuarios obtenidos:", data);
-      
+
       // Filtrar usuarios pendientes en el frontend
-      const pendingUsers = data.filter((user: any) => user.status === "PENDIENTE");
+      const pendingUsers = data
+        .filter((u: any) => u.status === "PENDIENTE")
+        .map((u: any) => normalizeUser(u) as User);
       console.log("Usuarios pendientes:", pendingUsers);
-      
-      return pendingUsers as User[];
+
+      return pendingUsers;
     } catch (err) {
       console.error("Error completo en getPendingUsers:", err);
       throw err;
@@ -436,7 +467,7 @@ class ApiClient {
 
   async approveUser(userId: string): Promise<User> {
     console.log("Aprobando usuario con ID:", userId);
-    
+
     try {
       const { data, error } = await supabase
         .from("users")
@@ -451,7 +482,7 @@ class ApiClient {
         console.error("approveUser error:", error);
         throw error;
       }
-      
+
       console.log("Usuario aprobado:", data);
       return data[0] as User; // Retornar primer elemento
     } catch (err) {
@@ -507,6 +538,34 @@ class ApiClient {
       admins,
       active,
     };
+  }
+
+  /**
+   * Obtiene una URL firmada para documentos de Supabase Storage.
+   * Necesario cuando el bucket es privado (ej. documentos sensibles como DNI/analíticos).
+   */
+  async getSignedDocumentUrl(url: string): Promise<string> {
+    if (!url || !url.includes("supabase") || !url.includes("/storage/")) {
+      return url;
+    }
+
+    try {
+      const match = url.match(/\/storage\/v1\/object\/public\/([^/]+)\/(.+)$/);
+      if (!match) return url;
+
+      const [, bucket, path] = match;
+      const { data, error } = await supabase.storage
+        .from(bucket)
+        .createSignedUrl(decodeURIComponent(path), 3600);
+
+      if (error) {
+        console.warn("getSignedDocumentUrl error, usando URL original:", error);
+        return url;
+      }
+      return data.signedUrl;
+    } catch {
+      return url;
+    }
   }
 
   async uploadFile(file: File, bucket: string, path: string): Promise<string> {

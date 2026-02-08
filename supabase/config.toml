@@ -1,0 +1,164 @@
+# Supabase Configuration for AcademiaNova University Platform
+# This file configures the local development environment and deployment settings
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[graphql]
+enabled = true
+port = 54322
+db_schema = "public"
+db_anon_role = "anon"
+db_authenticated_role = "authenticated"
+jwt_expires_in = 3600
+jwt_template = "gotrue"
+
+[inbucket]
+enabled = true
+port = 54324
+smtp_port = 1025
+pop3_port = 1110
+
+[realtime]
+enabled = true
+ip_version = "ipv4"
+port = 54325
+secure_channels = true
+max_channels_per_client = 100
+max_joins_per_second = 100
+max_events_per_second = 100
+
+[studio]
+enabled = true
+port = 54323
+api_url = "http://localhost:54321"
+
+[auth]
+enabled = true
+image = "supabase/gotrue:v2.132.3"
+port = 9999
+api_external_url = "http://localhost:54321"
+additional_redirect_urls = ["https://localhost:3000", "http://localhost:5173"]
+jwt_expiry = 3600
+refresh_token_rotation_enabled = true
+security_refresh_token_reuse_interval = 10
+enable_signup = true
+enable_email_confirmations = false
+enable_phone_confirmations = false
+enable_anonymous_users = false
+minimum_password_length = 8
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = false
+secure_email_change_enabled = true
+enable_reauthentication = true
+template_confirmation = ""
+template_invite = ""
+template_magic_link = ""
+template_recovery = ""
+template_email_change = ""
+
+[auth.sms]
+enable_signup = false
+enable_confirmations = false
+template_sms = ""
+
+[auth.external.google]
+enabled = false
+client_id = "your_google_client_id"
+secret = "your_google_secret"
+redirect_uri = "http://localhost:54321/auth/v1/callback"
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+[edge_functions]
+enabled = true
+verify_jwt = true
+import_map = "./supabase/functions/import_map.json"
+inspector_port = 8083
+
+[[edge_functions.custom_import_map]]
+module_specifier = "supabase"
+location = "https://esm.sh/@supabase/supabase-js@2"
+
+[functions.approve-student]
+verify_jwt = false
+import_map = "./supabase/functions/import_map.json"
+
+[functions.send-approval-email]
+verify_jwt = false
+import_map = "./supabase/functions/import_map.json"
+
+[analytics]
+enabled = false
+port = 54327
+vector_port = 54328
+# Consider enabling for production deployment
+# enabled = true
+# backend = "postgres"
+
+[storage]
+enabled = true
+port = 54326
+image = "supabase/storage-api:v0.46.4"
+file_size_limit = "50MiB"
+features = {
+  image_transformation = true,
+  duplicate_detection = false
+}
+
+[storage.buckets.student_documents]
+public = false
+file_size_limit = "10MiB"
+allowed_mime_types = ["image/jpeg", "image/png", "application/pdf"]
+objects_transform_enabled = true
+
+[storage.buckets.course_materials]
+public = true
+file_size_limit = "50MiB"
+allowed_mime_types = ["image/jpeg", "image/png", "application/pdf", "video/mp4"]
+
+[logging]
+level = "info"
+
+[experimental]
+# Enable experimental features
+webhooks = false
+orioledb_version = ""
+s3_host = "localhost"
+s3_region = "us-east-1"
+s3_access_key = ""
+s3_secret_key = ""
+
+[misc]
+# Miscellaneous settings
+project_id = "academianova"
+
+# Environment-specific configurations
+[local_development]
+enabled = true
+auto_schema_diff = true
+schema_diff_max_changes = 20
+
+# Production deployment settings
+[production]
+db_pool_size = 15
+db_max_client_conn = 200
+db_ssl_enforced = true
+api_max_request_duration = "10s"
+
+# Security settings
+[security]
+cors_origins = ["http://localhost:3000", "http://localhost:5173", "https://your-domain.com"]
+rate_limiting = true
+rate_limit_requests = 100
+rate_limit_window = "1m"

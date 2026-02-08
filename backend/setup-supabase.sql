@@ -13,8 +13,10 @@ CREATE TABLE IF NOT EXISTS users (
     professorId TEXT UNIQUE,
     semester INTEGER,
     avatar TEXT,
+    dniurl TEXT,
+    degreeurl TEXT,
     enrollmentDate TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    status TEXT NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'INACTIVE', 'SUSPENDED')),
+    status TEXT NOT NULL DEFAULT 'PENDIENTE' CHECK (status IN ('ACTIVE', 'INACTIVE', 'SUSPENDED', 'PENDIENTE', 'APROBADO', 'RECHAZADO')),
     gpa DECIMAL(3,2),
     credits INTEGER,
     password TEXT NOT NULL, -- Temporal para hash de contraseñas
@@ -47,3 +49,7 @@ CREATE POLICY "Users can insert their own profile" ON users
 -- Crear política para que usuarios puedan actualizar su propio perfil
 CREATE POLICY "Users can update own profile" ON users
     FOR UPDATE USING (auth.uid()::text = id);
+
+-- Si la tabla ya existía antes, agregar columnas para documentos (ejecutar si falta):
+ALTER TABLE users ADD COLUMN IF NOT EXISTS dniurl TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS degreeurl TEXT;

@@ -28,31 +28,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const { addNotification } = useNotifications();
 
   useEffect(() => {
+    let isInitialized = false;
+
     const initializeAuth = async () => {
+      if (isInitialized) return;
+      isInitialized = true;
+
       try {
-        // Check Supabase session first
-        const { data: { session } } = await supabase.auth.getSession();
-        
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
         if (session?.user) {
-          // Get user profile from database
           try {
             const userProfile = await api.getProfile();
             setUser(userProfile);
           } catch (profileError) {
             console.error("Profile error:", profileError);
-            // Session exists but profile not found, clear session
             await supabase.auth.signOut();
           }
         }
       } catch (error) {
         console.error("Auth initialization error:", error);
       } finally {
-        // Always set loading to false
         setIsLoading(false);
       }
     };
 
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === "SIGNED_OUT") {
+        setUser(null);
+      }
+    });
+
     initializeAuth();
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {

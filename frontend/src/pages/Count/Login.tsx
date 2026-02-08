@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FiMail, FiLock, FiLogIn } from "react-icons/fi";
 import { useAuth } from "../../hooks/useAuth";
+import { loginSchema } from "../../lib/validation";
 
 export const Login: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -20,6 +21,12 @@ export const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    const result = loginSchema.safeParse({ email, password });
+    if (!result.success) {
+      setError(result.error.errors[0]?.message ?? "Datos inválidos");
+      return;
+    }
 
     try {
       const success = await login(email, password);

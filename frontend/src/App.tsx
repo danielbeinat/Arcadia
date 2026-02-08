@@ -6,10 +6,10 @@ import { Footer } from "./Components/Footer/Footer";
 import { NotFound } from "./pages/NotFound/NotFound";
 import { NotificationProvider } from "./Components/Notifications/NotificationSystem";
 import { AuthProvider } from "./hooks/useAuth";
+import { useAppInitializer } from "./hooks/useAppInitializer";
 import { offlineManager } from "./utils/offlineManager";
 import { useEffect } from "react";
 import { api } from "./services/api";
-import { TestSupabase } from "./components/TestSupabase/TestSupabase";
 import { ProtectedRoute } from "./Components/Auth/ProtectedRoute";
 
 const Home = lazy(() =>
@@ -75,16 +75,89 @@ const Unauthorized = lazy(() =>
     default: m.Unauthorized,
   })),
 );
+const AdvancedFeaturesDemo = lazy(() =>
+  import("./Components/AdvancedFeaturesDemo/AdvancedFeaturesDemo").then(
+    (m) => ({
+      default: m.default,
+    }),
+  ),
+);
 
 import { ScrollToTop } from "./Components/ScrollToTop";
 
+const AppContent: React.FC = () => {
+  useAppInitializer();
+
+  return (
+    <>
+      <ScrollToTop />
+      <NavBar />
+
+      <Suspense
+        fallback={
+          <div className="flex items-center justify-center h-[50vh]">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+              <p className="text-gray-600">Cargando página...</p>
+            </div>
+          </div>
+        }
+      >
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/info" element={<Info />} />
+          <Route path="/requisitos" element={<Requirements />} />
+          <Route path="/online" element={<Online />} />
+          <Route path="/presenciales" element={<OnCampus />} />
+          <Route path="/demo" element={<AdvancedFeaturesDemo />} />
+          <Route
+            path="/portal"
+            element={
+              <ProtectedRoute>
+                <Portal />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute allowedRoles={["ADMIN", "PROFESSOR", "STUDENT"]}>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/servicios"
+            element={
+              <ProtectedRoute>
+                <Services />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/cursos" element={<Courses />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/inscripciones" element={<Inscription />} />
+          <Route path="/area/:category" element={<Category />} />
+          <Route path="/validate-account" element={<ValidateAccount />} />
+          <Route path="/career/:careerId" element={<DisplayDegree />} />
+          <Route path="/eventos" element={<Events />} />
+          <Route path="/unauthorized" element={<Unauthorized />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
+
+      <Footer />
+      <ChatBox />
+    </>
+  );
+};
+
 export const App: React.FC = () => {
   useEffect(() => {
-    // Silent wake-up call to the backend
     api.wakeUp();
 
     offlineManager.setupNetworkListeners((status) => {
-      console.log("Network status changed:", status);
       if (status === "online") {
         offlineManager.syncWhenOnline();
       }
@@ -102,63 +175,7 @@ export const App: React.FC = () => {
   return (
     <NotificationProvider>
       <AuthProvider>
-        <ScrollToTop />
-        <NavBar />
-
-        <Suspense
-          fallback={
-            <div className="flex items-center justify-center h-[50vh] text-gray-600">
-              Cargando...
-            </div>
-          }
-        >
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/info" element={<Info />} />
-            <Route path="/requisitos" element={<Requirements />} />
-            <Route path="/online" element={<Online />} />
-            <Route path="/presenciales" element={<OnCampus />} />
-            <Route
-              path="/portal"
-              element={
-                <ProtectedRoute>
-                  <Portal />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute
-                  allowedRoles={["ADMIN", "PROFESSOR", "STUDENT"]}
-                >
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/servicios"
-              element={
-                <ProtectedRoute>
-                  <Services />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/cursos" element={<Courses />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/inscripciones" element={<Inscription />} />
-            <Route path="/area/:category" element={<Category />} />
-            <Route path="/validate-account" element={<ValidateAccount />} />
-            <Route path="/career/:careerId" element={<DisplayDegree />} />
-            <Route path="/eventos" element={<Events />} />
-            <Route path="/unauthorized" element={<Unauthorized />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
-
-        <Footer />
-        <ChatBox />
+        <AppContent />
       </AuthProvider>
     </NotificationProvider>
   );
