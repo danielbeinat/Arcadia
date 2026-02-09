@@ -258,15 +258,19 @@ export const Inscription: React.FC = () => {
             .from("users")
             .select("email")
             .eq("email", formData.email);
-          
-          if (error && error.code === '401') {
+
+          if (error && error.code === "401") {
             // Si no hay permisos, permitimos continuar (validación al final)
-            console.log("No se puede validar email ahora, se validará al final");
+            console.log(
+              "No se puede validar email ahora, se validará al final",
+            );
             return true;
           }
-          
+
           if (data && data.length > 0) {
-            setError("Este email ya está registrado. Por favor usa otro email.");
+            setError(
+              "Este email ya está registrado. Por favor usa otro email.",
+            );
             return false;
           }
           return true;
@@ -319,7 +323,8 @@ export const Inscription: React.FC = () => {
         program: formData.program || "Sin programa",
       });
       if (!result.success) {
-        const msg = result.error.errors[0]?.message ?? "Revisa los datos del formulario";
+        const msg =
+          result.error.errors[0]?.message ?? "Revisa los datos del formulario";
         throw new Error(msg);
       }
 
@@ -495,7 +500,7 @@ export const Inscription: React.FC = () => {
               ¡Ya estás registrado en Arcadia!
             </h2>
             <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-              Hola <strong>{user.name}</strong>, detectamos que ya tienes una
+              Hola <strong>{user?.name}</strong>, detectamos que ya tienes una
               cuenta activa en nuestra plataforma. No es necesario completar el
               formulario de inscripción nuevamente.
             </p>

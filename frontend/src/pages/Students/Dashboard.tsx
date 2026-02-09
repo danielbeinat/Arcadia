@@ -476,7 +476,7 @@ export const Dashboard: React.FC = () => {
               <div
                 className="bg-gradient-to-r from-indigo-500 to-purple-600 h-3 rounded-full transition-all duration-500"
                 style={{
-                  width: `${getProgressPercentage(user.semester || 1)}%`,
+                  width: `${getProgressPercentage(user?.semester || 1)}%`,
                 }}
               />
             </div>
@@ -625,7 +625,7 @@ export const Dashboard: React.FC = () => {
     if (isPending) return renderOverview();
 
     const userDegree = AllDegrees.find(
-      (d) => d.name.toLowerCase() === user.program?.toLowerCase(),
+      (d) => d.name.toLowerCase() === user?.program?.toLowerCase(),
     );
 
     return (
@@ -714,7 +714,7 @@ export const Dashboard: React.FC = () => {
                                   Código: {year}0{subject}
                                 </span>
 
-                                {year < (user.semester || 1) / 2 ? (
+                                {year < (user?.semester || 1) / 2 ? (
                                   <CheckCircle className="w-4 h-4 text-green-500" />
                                 ) : (
                                   <Clock className="w-4 h-4 text-gray-300" />
@@ -789,8 +789,8 @@ export const Dashboard: React.FC = () => {
                         <span>Materias Aprobadas</span>
 
                         <span>
-                          {user.semester && user.semester > 1
-                            ? Math.floor(((user.semester - 1) / 10) * 40)
+                          {user?.semester && user?.semester > 1
+                            ? Math.floor(((user?.semester - 1) / 10) * 40)
                             : 0}{" "}
                           / 40
                         </span>
@@ -801,8 +801,8 @@ export const Dashboard: React.FC = () => {
                           className="bg-white h-2 rounded-full"
                           style={{
                             width: `${
-                              user.semester && user.semester > 1
-                                ? getProgressPercentage(user.semester - 1)
+                              user?.semester && user?.semester > 1
+                                ? getProgressPercentage(user?.semester - 1)
                                 : 0
                             }%`,
                           }}
@@ -815,14 +815,16 @@ export const Dashboard: React.FC = () => {
                         <p className="text-xs opacity-80 mb-1">Promedio</p>
 
                         <p className="text-xl font-bold">
-                          {formatGPA(user.gpa)}
+                          {formatGPA(user?.gpa)}
                         </p>
                       </div>
 
                       <div className="bg-white/10 rounded-xl p-3 text-center">
                         <p className="text-xs opacity-80 mb-1">Créditos</p>
 
-                        <p className="text-xl font-bold">{user.credits || 0}</p>
+                        <p className="text-xl font-bold">
+                          {user?.credits || 0}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -854,7 +856,7 @@ export const Dashboard: React.FC = () => {
 
             <p className="text-gray-500">
               No hemos podido encontrar información detallada para el programa:{" "}
-              <span className="font-bold text-indigo-600">{user.program}</span>
+              <span className="font-bold text-indigo-600">{user?.program}</span>
             </p>
           </div>
         )}
@@ -888,14 +890,14 @@ export const Dashboard: React.FC = () => {
     if (isPending) return renderOverview();
 
     const userDegree = AllDegrees.find(
-      (d) => d.name.toLowerCase() === user.program?.toLowerCase(),
+      (d) => d.name.toLowerCase() === user?.program?.toLowerCase(),
     );
 
     // Filter subjects for the current semester
 
     const currentSemesterSubjects =
       userDegree?.subjects?.filter(
-        (s: any) => s.semester === (user.semester || 1),
+        (s: any) => s.semester === (user?.semester || 1),
       ) || [];
 
     return (
@@ -912,7 +914,7 @@ export const Dashboard: React.FC = () => {
               </h3>
 
               <p className="text-gray-500">
-                {user.semester || 1}° Semestre - {user.program}
+                {user?.semester || 1}° Semestre - {user?.program}
               </p>
             </div>
 
@@ -946,7 +948,7 @@ export const Dashboard: React.FC = () => {
                   </h4>
 
                   <p className="text-sm text-gray-500 mb-4">
-                    Código: {user.program?.substring(0, 3).toUpperCase()}-
+                    Código: {user?.program?.substring(0, 3).toUpperCase()}-
                     {100 + index}
                   </p>
 
@@ -1482,7 +1484,7 @@ export const Dashboard: React.FC = () => {
 
             <input
               type="text"
-              value={user.name || ""}
+              value={user?.name || ""}
               disabled
               className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
             />
@@ -1495,7 +1497,7 @@ export const Dashboard: React.FC = () => {
 
             <input
               type="text"
-              value={user.lastName || ""}
+              value={user?.lastName || ""}
               disabled
               className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
             />
@@ -1508,7 +1510,7 @@ export const Dashboard: React.FC = () => {
 
             <input
               type="email"
-              value={user.email || ""}
+              value={user?.email || ""}
               disabled
               className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
             />
@@ -1516,31 +1518,31 @@ export const Dashboard: React.FC = () => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              {user.role === "PROFESSOR" ? "ID de Profesor" : "ID Estudiantil"}
+              {user?.role === "PROFESSOR" ? "ID de Profesor" : "ID Estudiantil"}
             </label>
 
             <div className="relative">
               <input
                 type="text"
                 value={
-                  (user.role === "PROFESSOR"
-                    ? user.professorId
-                    : user.studentId) || ""
+                  (user?.role === "PROFESSOR"
+                    ? user?.professorId
+                    : user?.studentId) || ""
                 }
                 placeholder="Pendiente de asignación..."
                 disabled
                 className={`w-full px-4 py-2 border rounded-lg bg-gray-50 ${
-                  !(user.role === "PROFESSOR"
-                    ? user.professorId
-                    : user.studentId)
+                  !(user?.role === "PROFESSOR"
+                    ? user?.professorId
+                    : user?.studentId)
                     ? "text-amber-600 border-amber-200 italic"
                     : "text-gray-900 border-gray-300"
                 }`}
               />
 
-              {!(user.role === "PROFESSOR"
-                ? user.professorId
-                : user.studentId) && (
+              {!(user?.role === "PROFESSOR"
+                ? user?.professorId
+                : user?.studentId) && (
                 <div className="absolute right-3 top-1/2 -translate-y-1/2">
                   <span className="flex h-2 w-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
@@ -1559,7 +1561,7 @@ export const Dashboard: React.FC = () => {
 
             <input
               type="text"
-              value={user.program || ""}
+              value={user?.program || ""}
               disabled
               className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
             />
@@ -1572,7 +1574,7 @@ export const Dashboard: React.FC = () => {
 
             <input
               type="text"
-              value={user.semester ? `${user.semester}° semestre` : "N/A"}
+              value={user?.semester ? `${user?.semester}° semestre` : "N/A"}
               disabled
               className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
             />
@@ -1603,7 +1605,7 @@ export const Dashboard: React.FC = () => {
           </h1>
 
           <h2 className="text-xl font-bold text-gray-900 mb-2">
-            ¡Hola, {user.name}!
+            ¡Hola, {user?.name}!
           </h2>
 
           <p className="text-gray-600">Bienvenido a tu portal personal</p>
@@ -1625,7 +1627,7 @@ export const Dashboard: React.FC = () => {
 
             { id: "profile", label: "Perfil", icon: Settings },
 
-            ...(user.role === "ADMIN"
+            ...(user?.role === "ADMIN"
               ? [{ id: "admin", label: "Administración", icon: ShieldAlert }]
               : []),
           ].map((tab) => (
