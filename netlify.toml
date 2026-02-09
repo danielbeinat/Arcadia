@@ -4,14 +4,30 @@
   publish = "dist"
 
 [[headers]]
-  for = "/assets/*"
+  for = "/"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+
+[[headers]]
+  for = "*.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+
+[[headers]]
+  for = "/assets/*.js"
   [headers.values]
     Cache-Control = "max-age=31536000"
+    Content-Type = "application/javascript"
 
-[[redirects]]
-  from = "/assets/*"
-  to = "/assets/:splat"
-  status = 200
+[[headers]]
+  for = "/assets/*.css"
+  [headers.values]
+    Cache-Control = "max-age=31536000"
+    Content-Type = "text/css"
 
 [[redirects]]
   from = "/*"
