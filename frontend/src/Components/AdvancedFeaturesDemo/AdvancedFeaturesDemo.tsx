@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Bell,
   Search,
@@ -24,12 +24,12 @@ import {
   Play,
   Pause,
   RotateCcw,
-} from 'lucide-react';
-import { useRealtime } from '../../hooks/useRealtime';
-import { useAdvancedSearch } from '../../hooks/useAdvancedSearch';
-import { usePerformanceMonitoring } from '../../hooks/usePerformanceMonitoring';
-import { useAuth } from '../../hooks/useAuth';
-import { useNotifications } from '../Notifications/NotificationSystem';
+} from "lucide-react";
+import { useRealtime } from "../../hooks/useRealtime";
+import { useAdvancedSearch } from "../../hooks/useAdvancedSearch";
+import { usePerformanceMonitoring } from "../../hooks/usePerformanceMonitoring";
+import { useAuth } from "../../hooks/useAuth";
+import { useNotifications } from "../Notifications/NotificationSystem";
 
 interface FeatureDemo {
   id: string;
@@ -44,14 +44,15 @@ interface FeatureDemo {
 const AdvancedFeaturesDemo: React.FC = () => {
   const { user } = useAuth();
   const { addNotification } = useNotifications();
-  const { isConnected, connectionStatus } = useRealtime();
-  const { search, results, isLoading: searchLoading, totalCount } = useAdvancedSearch();
+  const { isConnected, connectionStatus } = useRealtime({ user });
   const {
-    getPerformanceSummary,
-    trackUserAction,
-    vitals,
-    isTracking
-  } = usePerformanceMonitoring();
+    search,
+    results,
+    isLoading: searchLoading,
+    totalCount,
+  } = useAdvancedSearch();
+  const { getPerformanceSummary, trackUserAction, vitals, isTracking } =
+    usePerformanceMonitoring();
 
   const [isDemoActive, setIsDemoActive] = useState(false);
   const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
@@ -60,57 +61,60 @@ const AdvancedFeaturesDemo: React.FC = () => {
 
   const features: FeatureDemo[] = [
     {
-      id: 'realtime',
-      title: 'Notificaciones en Tiempo Real',
-      description: 'Sistema completo de notificaciones instantáneas usando Supabase Realtime',
+      id: "realtime",
+      title: "Notificaciones en Tiempo Real",
+      description:
+        "Sistema completo de notificaciones instantáneas usando Supabase Realtime",
       icon: <Bell className="w-8 h-8" />,
-      color: 'from-blue-500 to-cyan-500',
+      color: "from-blue-500 to-cyan-500",
       isActive: isConnected,
       metrics: {
         status: connectionStatus,
-        connection: isConnected ? 'Conectado' : 'Desconectado',
-        latency: '< 50ms',
-      }
+        connection: isConnected ? "Conectado" : "Desconectado",
+        latency: "< 50ms",
+      },
     },
     {
-      id: 'search',
-      title: 'Búsqueda Avanzada con IA',
-      description: 'Full-text search con PostgreSQL, filtros inteligentes y sugerencias',
+      id: "search",
+      title: "Búsqueda Avanzada con IA",
+      description:
+        "Full-text search con PostgreSQL, filtros inteligentes y sugerencias",
       icon: <Search className="w-8 h-8" />,
-      color: 'from-purple-500 to-pink-500',
+      color: "from-purple-500 to-pink-500",
       isActive: true,
       metrics: {
         results: totalCount,
-        searchTime: '< 100ms',
-        accuracy: '98%',
-      }
+        searchTime: "< 100ms",
+        accuracy: "98%",
+      },
     },
     {
-      id: 'edge-functions',
-      title: 'Edge Functions Serverless',
-      description: 'Funciones serverless para aprobaciones automáticas y emails',
+      id: "edge-functions",
+      title: "Edge Functions Serverless",
+      description:
+        "Funciones serverless para aprobaciones automáticas y emails",
       icon: <Zap className="w-8 h-8" />,
-      color: 'from-yellow-500 to-orange-500',
+      color: "from-yellow-500 to-orange-500",
       isActive: true,
       metrics: {
         functions: 2,
-        invocations: '500K/mes',
-        latency: '< 200ms',
-      }
+        invocations: "500K/mes",
+        latency: "< 200ms",
+      },
     },
     {
-      id: 'analytics',
-      title: 'Analytics & Performance',
-      description: 'Monitoreo avanzado de rendimiento y Web Vitals',
+      id: "analytics",
+      title: "Analytics & Performance",
+      description: "Monitoreo avanzado de rendimiento y Web Vitals",
       icon: <BarChart3 className="w-8 h-8" />,
-      color: 'from-green-500 to-teal-500',
+      color: "from-green-500 to-teal-500",
       isActive: isTracking,
       metrics: performanceStats || {
-        vitals: 'Good',
+        vitals: "Good",
         sessions: 0,
         pageViews: 0,
-      }
-    }
+      },
+    },
   ];
 
   useEffect(() => {
@@ -122,12 +126,12 @@ const AdvancedFeaturesDemo: React.FC = () => {
     setIsDemoActive(true);
     setDemoStep(1);
 
-    trackUserAction('demo_started', 'advanced_features_demo');
+    trackUserAction("demo_started", "advanced_features_demo");
 
     addNotification({
-      type: 'info',
-      title: '🎯 Demo Iniciado',
-      message: 'Te mostraré todas las funcionalidades avanzadas implementadas',
+      type: "info",
+      title: "🎯 Demo Iniciado",
+      message: "Te mostraré todas las funcionalidades avanzadas implementadas",
       duration: 4000,
     });
 
@@ -139,44 +143,45 @@ const AdvancedFeaturesDemo: React.FC = () => {
   };
 
   const demonstrateRealtime = () => {
-    setSelectedFeature('realtime');
+    setSelectedFeature("realtime");
     setDemoStep(2);
 
     addNotification({
-      type: 'success',
-      title: '🔔 Realtime Demo',
-      message: 'Esta notificación se envió usando Supabase Realtime con WebSockets',
+      type: "success",
+      title: "🔔 Realtime Demo",
+      message:
+        "Esta notificación se envió usando Supabase Realtime con WebSockets",
       duration: 5000,
     });
 
     setTimeout(() => {
       addNotification({
-        type: 'info',
-        title: '👥 Usuario Online',
-        message: 'Sistema de presencia detecta usuarios activos en tiempo real',
+        type: "info",
+        title: "👥 Usuario Online",
+        message: "Sistema de presencia detecta usuarios activos en tiempo real",
         duration: 4000,
       });
     }, 2000);
   };
 
   const demonstrateSearch = async () => {
-    setSelectedFeature('search');
+    setSelectedFeature("search");
     setDemoStep(3);
 
     addNotification({
-      type: 'info',
-      title: '🔍 Búsqueda Avanzada',
-      message: 'Ejecutando búsqueda con full-text search en PostgreSQL...',
+      type: "info",
+      title: "🔍 Búsqueda Avanzada",
+      message: "Ejecutando búsqueda con full-text search en PostgreSQL...",
       duration: 4000,
     });
 
     // Perform actual search
-    await search('programación', { category: 'courses' });
+    await search("programación", { category: "courses" });
 
     setTimeout(() => {
       addNotification({
-        type: 'success',
-        title: '✅ Búsqueda Completada',
+        type: "success",
+        title: "✅ Búsqueda Completada",
         message: `Encontrados ${totalCount} resultados con IA y filtros inteligentes`,
         duration: 4000,
       });
@@ -184,44 +189,47 @@ const AdvancedFeaturesDemo: React.FC = () => {
   };
 
   const demonstrateEdgeFunctions = () => {
-    setSelectedFeature('edge-functions');
+    setSelectedFeature("edge-functions");
     setDemoStep(4);
 
     addNotification({
-      type: 'warning',
-      title: '⚡ Edge Function',
-      message: 'Simulando aprobación automática de estudiante...',
+      type: "warning",
+      title: "⚡ Edge Function",
+      message: "Simulando aprobación automática de estudiante...",
       duration: 3000,
     });
 
     setTimeout(() => {
       addNotification({
-        type: 'success',
-        title: '🎉 Proceso Automatizado',
-        message: 'Edge Function procesó la solicitud y envió email de confirmación',
+        type: "success",
+        title: "🎉 Proceso Automatizado",
+        message:
+          "Edge Function procesó la solicitud y envió email de confirmación",
         duration: 5000,
       });
     }, 2000);
   };
 
   const demonstrateAnalytics = () => {
-    setSelectedFeature('analytics');
+    setSelectedFeature("analytics");
     setDemoStep(5);
 
-    trackUserAction('demo_analytics_view', 'performance_showcase');
+    trackUserAction("demo_analytics_view", "performance_showcase");
 
     addNotification({
-      type: 'info',
-      title: '📊 Analytics en Tiempo Real',
-      message: 'Monitoreando Web Vitals, performance y comportamiento del usuario',
+      type: "info",
+      title: "📊 Analytics en Tiempo Real",
+      message:
+        "Monitoreando Web Vitals, performance y comportamiento del usuario",
       duration: 4000,
     });
 
     setTimeout(() => {
       addNotification({
-        type: 'success',
-        title: '🎯 Demo Completado',
-        message: 'Todas las funcionalidades avanzadas están activas y funcionando',
+        type: "success",
+        title: "🎯 Demo Completado",
+        message:
+          "Todas las funcionalidades avanzadas están activas y funcionando",
         duration: 6000,
       });
       setIsDemoActive(false);
@@ -236,20 +244,44 @@ const AdvancedFeaturesDemo: React.FC = () => {
     setDemoStep(0);
 
     addNotification({
-      type: 'info',
-      title: '🔄 Demo Reiniciado',
-      message: 'Listo para mostrar las funcionalidades nuevamente',
+      type: "info",
+      title: "🔄 Demo Reiniciado",
+      message: "Listo para mostrar las funcionalidades nuevamente",
       duration: 3000,
     });
   };
 
   const techStack = [
-    { name: 'Supabase Realtime', icon: <Wifi className="w-5 h-5" />, status: 'active' },
-    { name: 'PostgreSQL FTS', icon: <Database className="w-5 h-5" />, status: 'active' },
-    { name: 'Edge Functions', icon: <Server className="w-5 h-5" />, status: 'active' },
-    { name: 'Web Vitals API', icon: <Activity className="w-5 h-5" />, status: 'active' },
-    { name: 'TypeScript', icon: <Code className="w-5 h-5" />, status: 'active' },
-    { name: 'React Hooks', icon: <Smartphone className="w-5 h-5" />, status: 'active' },
+    {
+      name: "Supabase Realtime",
+      icon: <Wifi className="w-5 h-5" />,
+      status: "active",
+    },
+    {
+      name: "PostgreSQL FTS",
+      icon: <Database className="w-5 h-5" />,
+      status: "active",
+    },
+    {
+      name: "Edge Functions",
+      icon: <Server className="w-5 h-5" />,
+      status: "active",
+    },
+    {
+      name: "Web Vitals API",
+      icon: <Activity className="w-5 h-5" />,
+      status: "active",
+    },
+    {
+      name: "TypeScript",
+      icon: <Code className="w-5 h-5" />,
+      status: "active",
+    },
+    {
+      name: "React Hooks",
+      icon: <Smartphone className="w-5 h-5" />,
+      status: "active",
+    },
   ];
 
   return (
@@ -262,7 +294,9 @@ const AdvancedFeaturesDemo: React.FC = () => {
           className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-100 to-pink-100 px-4 py-2 rounded-full mb-6"
         >
           <Star className="w-5 h-5 text-purple-600" />
-          <span className="text-purple-800 font-semibold">Funcionalidades Avanzadas</span>
+          <span className="text-purple-800 font-semibold">
+            Funcionalidades Avanzadas
+          </span>
         </motion.div>
 
         <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 bg-clip-text text-transparent mb-6">
@@ -270,8 +304,10 @@ const AdvancedFeaturesDemo: React.FC = () => {
         </h1>
 
         <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-          Sistema universitario con <strong>Realtime WebSockets</strong>, <strong>Edge Functions</strong>,
-          <strong> Full-Text Search</strong> y <strong>Performance Analytics</strong> implementados con Supabase y React.
+          Sistema universitario con <strong>Realtime WebSockets</strong>,{" "}
+          <strong>Edge Functions</strong>,<strong> Full-Text Search</strong> y{" "}
+          <strong>Performance Analytics</strong> implementados con Supabase y
+          React.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -303,8 +339,10 @@ const AdvancedFeaturesDemo: React.FC = () => {
           )}
 
           <div className="flex items-center gap-2 text-sm text-gray-500">
-            <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} />
-            Realtime: {isConnected ? 'Conectado' : 'Desconectado'}
+            <div
+              className={`w-2 h-2 rounded-full ${isConnected ? "bg-green-500" : "bg-red-500"}`}
+            />
+            Realtime: {isConnected ? "Conectado" : "Desconectado"}
           </div>
         </div>
       </div>
@@ -319,12 +357,18 @@ const AdvancedFeaturesDemo: React.FC = () => {
             transition={{ delay: index * 0.1 }}
             className={`relative p-6 rounded-xl border-2 transition-all cursor-pointer ${
               selectedFeature === feature.id
-                ? 'border-purple-300 bg-purple-50 shadow-lg scale-105'
-                : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-md'
+                ? "border-purple-300 bg-purple-50 shadow-lg scale-105"
+                : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-md"
             }`}
-            onClick={() => setSelectedFeature(selectedFeature === feature.id ? null : feature.id)}
+            onClick={() =>
+              setSelectedFeature(
+                selectedFeature === feature.id ? null : feature.id,
+              )
+            }
           >
-            <div className={`inline-flex p-3 rounded-lg bg-gradient-to-r ${feature.color} text-white mb-4`}>
+            <div
+              className={`inline-flex p-3 rounded-lg bg-gradient-to-r ${feature.color} text-white mb-4`}
+            >
               {feature.icon}
             </div>
 
@@ -332,18 +376,20 @@ const AdvancedFeaturesDemo: React.FC = () => {
               {feature.title}
             </h3>
 
-            <p className="text-gray-600 text-sm mb-4">
-              {feature.description}
-            </p>
+            <p className="text-gray-600 text-sm mb-4">{feature.description}</p>
 
             <div className="flex items-center justify-between">
-              <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ${
-                feature.isActive
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-gray-100 text-gray-500'
-              }`}>
-                <div className={`w-2 h-2 rounded-full ${feature.isActive ? 'bg-green-500' : 'bg-gray-400'}`} />
-                {feature.isActive ? 'Activo' : 'Inactivo'}
+              <div
+                className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ${
+                  feature.isActive
+                    ? "bg-green-100 text-green-700"
+                    : "bg-gray-100 text-gray-500"
+                }`}
+              >
+                <div
+                  className={`w-2 h-2 rounded-full ${feature.isActive ? "bg-green-500" : "bg-gray-400"}`}
+                />
+                {feature.isActive ? "Activo" : "Inactivo"}
               </div>
 
               <Eye className="w-4 h-4 text-gray-400" />
@@ -354,7 +400,7 @@ const AdvancedFeaturesDemo: React.FC = () => {
               {selectedFeature === feature.id && feature.metrics && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
+                  animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
                   className="mt-4 pt-4 border-t border-gray-200"
                 >
@@ -363,7 +409,9 @@ const AdvancedFeaturesDemo: React.FC = () => {
                     {Object.entries(feature.metrics).map(([key, value]) => (
                       <div key={key} className="flex justify-between">
                         <span className="text-gray-500 capitalize">{key}:</span>
-                        <span className="font-medium text-gray-700">{String(value)}</span>
+                        <span className="font-medium text-gray-700">
+                          {String(value)}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -389,9 +437,7 @@ const AdvancedFeaturesDemo: React.FC = () => {
               transition={{ delay: index * 0.1 }}
               className="flex flex-col items-center gap-2 p-4 bg-white rounded-lg shadow-sm"
             >
-              <div className="text-blue-600">
-                {tech.icon}
-              </div>
+              <div className="text-blue-600">{tech.icon}</div>
               <span className="text-xs font-medium text-gray-700 text-center">
                 {tech.name}
               </span>
@@ -417,7 +463,9 @@ const AdvancedFeaturesDemo: React.FC = () => {
             {Object.entries(vitals).map(([key, value]) => (
               <div key={key} className="text-center p-3 bg-gray-50 rounded-lg">
                 <div className="text-2xl font-bold text-blue-600">
-                  {value ? `${Math.round(value)}${key === 'cls' ? '' : 'ms'}` : '--'}
+                  {value
+                    ? `${Math.round(value)}${key === "cls" ? "" : "ms"}`
+                    : "--"}
                 </div>
                 <div className="text-xs font-medium text-gray-600 uppercase">
                   {key}
@@ -439,18 +487,24 @@ const AdvancedFeaturesDemo: React.FC = () => {
           >
             <div className="flex items-center gap-3 mb-3">
               <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse" />
-              <span className="font-semibold text-gray-900">Demo en Progreso</span>
+              <span className="font-semibold text-gray-900">
+                Demo en Progreso
+              </span>
             </div>
 
             <div className="text-sm text-gray-600 mb-3">
-              Paso {demoStep} de 5: {
-                demoStep === 1 ? 'Iniciando...' :
-                demoStep === 2 ? 'Realtime Notifications' :
-                demoStep === 3 ? 'Advanced Search' :
-                demoStep === 4 ? 'Edge Functions' :
-                demoStep === 5 ? 'Analytics & Performance' :
-                'Completado'
-              }
+              Paso {demoStep} de 5:{" "}
+              {demoStep === 1
+                ? "Iniciando..."
+                : demoStep === 2
+                  ? "Realtime Notifications"
+                  : demoStep === 3
+                    ? "Advanced Search"
+                    : demoStep === 4
+                      ? "Edge Functions"
+                      : demoStep === 5
+                        ? "Analytics & Performance"
+                        : "Completado"}
             </div>
 
             <div className="w-full bg-gray-200 rounded-full h-2">
@@ -471,8 +525,9 @@ const AdvancedFeaturesDemo: React.FC = () => {
           ¿Impresionado con las tecnologías implementadas?
         </h3>
         <p className="text-purple-100 mb-6 max-w-2xl mx-auto">
-          Este proyecto demuestra experiencia avanzada en desarrollo full-stack moderno,
-          implementación de arquitecturas escalables y tecnologías de vanguardia.
+          Este proyecto demuestra experiencia avanzada en desarrollo full-stack
+          moderno, implementación de arquitecturas escalables y tecnologías de
+          vanguardia.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
