@@ -127,7 +127,7 @@ export const usePerformanceMonitoring = (enableTracking = true) => {
       // Send to Supabase (debounced to avoid too many requests)
       sendMetricsToSupabase([newMetric]);
     },
-    [state.isTracking, user?.id],
+    [state.isTracking],
   );
 
   // Store metrics locally (simplified to avoid DB errors)
