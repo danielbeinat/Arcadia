@@ -7,18 +7,14 @@ function normalizeUser(row: Record<string, unknown> | null): User | null {
   return {
     ...row,
     name: (row.name ?? "") as string,
-    lastName: (row.lastname ?? row.lastName ?? "") as string,
-    studentId: (row.studentid ?? row.studentId) as string | undefined,
-    professorId: (row.professorid ?? row.professorId) as string | undefined,
-    dniUrl: (row.dniurl ?? row.dniUrl) as string | undefined,
-    degreeUrl: (row.degreeurl ?? row.degreeUrl) as string | undefined,
-    createdAt: (row.createdat ?? row.created_at ?? row.createdAt) as
-      | string
-      | undefined,
-    updatedAt: (row.updatedat ?? row.updatedAt) as string | undefined,
-    enrollmentDate: (row.enrollmentdate ?? row.enrollmentDate) as
-      | string
-      | undefined,
+    lastName: (row.lastname ?? "") as string,
+    studentId: (row.studentid ?? "") as string | undefined,
+    professorId: (row.professorid ?? "") as string | undefined,
+    dniUrl: (row.dniurl ?? "") as string | undefined,
+    degreeUrl: (row.degreeurl ?? "") as string | undefined,
+    createdAt: (row.createdat ?? row.created_at ?? "") as string | undefined,
+    updatedAt: (row.updatedat ?? "") as string | undefined,
+    enrollmentDate: (row.enrollmentdate ?? "") as string | undefined,
     semester: (row.semester ?? undefined) as number | undefined,
   } as User;
 }
@@ -168,7 +164,7 @@ class ApiClient {
       id: data.user.id,
       email: cleanEmail,
       name: name,
-      lastName: lastName,
+      lastname: lastName,
       status: "PENDIENTE",
       role: "STUDENT",
       createdat: new Date().toISOString(),
