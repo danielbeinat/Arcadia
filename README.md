@@ -31,10 +31,9 @@ AcademiaNova es una plataforma integral de gestión universitaria de nivel profe
 - **Vitest** (tests unitarios)
 
 ### Backend / Infraestructura
-- **Supabase**: PostgreSQL, Auth, Storage
-- **Node.js + Express** (opcional, para migraciones)
-- **Cloudinary** (imágenes, si se usa)
-- **Netlify** (frontend) | **Render** (backend)
+- **Supabase**: PostgreSQL, Auth, Storage, Edge Functions
+- **Netlify** (frontend deployment)
+- **Real-time**: WebSockets con Supabase Realtime
 
 ---
 
@@ -42,16 +41,25 @@ AcademiaNova es una plataforma integral de gestión universitaria de nivel profe
 
 ```
 university-site/
-├── frontend/           # React + Vite
+├── frontend/                    # React + Vite + TypeScript
 │   ├── src/
-│   │   ├── Components/ # Componentes reutilizables
-│   │   ├── pages/      # Páginas/rutas
-│   │   ├── hooks/      # Custom hooks (useAuth, etc.)
-│   │   ├── services/   # API, Supabase
-│   │   ├── lib/        # Validación (Zod), Supabase client
-│   │   └── types/      # Tipos TypeScript
-│   └── ...
-├── backend/            # Express + Prisma (opcional)
+│   │   ├── Components/         # Componentes reutilizables
+│   │   │   ├── Auth/          # Autenticación
+│   │   │   ├── Dashboard/     # Paneles de control
+│   │   │   ├── Notifications/ # Sistema de notificaciones
+│   │   │   └── ...
+│   │   ├── hooks/             # Custom hooks avanzados
+│   │   │   ├── useAuth.tsx    # Autenticación
+│   │   │   ├── useRealtime.ts # Notificaciones real-time
+│   │   │   ├── useAdvancedSearch.ts # Búsqueda inteligente
+│   │   │   └── usePerformanceMonitoring.ts
+│   │   ├── services/          # Supabase services
+│   │   ├── lib/              # Validación (Zod), Supabase client
+│   │   └── types/            # Tipos TypeScript
+├── supabase/                   # Edge Functions
+│   └── functions/             # Serverless functions
+│       ├── approve-student/   # Aprobación automática
+│       └── send-approval-email/ # Emails automatizados
 └── README.md
 ```
 
@@ -72,28 +80,30 @@ npm install
 Crear `frontend/.env`:
 
 ```env
-VITE_SUPABASE_URL=https://tu-proyecto.supabase.co
-VITE_SUPABASE_ANON_KEY=tu-anon-key
+VITE_SUPABASE_URL=https://tu-proyecto-id.supabase.co
+VITE_SUPABASE_ANON_KEY=tu-anon-key-publico
 ```
 
-### 3. Base de datos (Supabase)
+📋 **Ver guía completa**: [ENVIRONMENT_SETUP.md](ENVIRONMENT_SETUP.md)
 
-1. Crear proyecto en [supabase.com](https://supabase.com)
-2. **Configuración básica**: Ejecutar SQL en `backend/setup-supabase.sql`
-3. **Funcionalidades avanzadas**: Ejecutar SQL en `backend/setup-advanced-features.sql`
-4. **Edge Functions** (opcional): Desplegar funciones serverless
+### 3. Configuración de Supabase
+
+1. **Crear proyecto** en [supabase.com](https://supabase.com)
+2. **Setup base de datos**:
+   ```sql
+   -- 1. Ejecutar en SQL Editor de Supabase
+   -- SQL disponible en documentación completa
+   ```
+3. **Configurar Storage** para documentos (DNI, analítico)
+4. **Edge Functions** (opcional):
    ```bash
-   # Instalar Supabase CLI
-   npm install -g supabase
-   
-   # Login y configurar proyecto
    supabase login
    supabase link --project-ref tu-project-ref
-   
-   # Desplegar Edge Functions
    supabase functions deploy approve-student
    supabase functions deploy send-approval-email
    ```
+
+📋 **Guía completa de setup**: [ENVIRONMENT_SETUP.md](ENVIRONMENT_SETUP.md)
 
 ### 4. Ejecutar
 
@@ -141,9 +151,17 @@ npm run test:watch    # Modo watch
 
 ## 📦 Build y Despliegue
 
-- **Frontend:** Netlify (detecta Vite automáticamente)
-- **Backend:** Render (si se usa Express)
-- **DB:** Supabase (PostgreSQL + Realtime + Edge Functions)
+- **Frontend:** Netlify (React + Vite)
+- **Backend:** Supabase (PostgreSQL + Auth + Storage + Edge Functions)
+- **Real-time:** Supabase Realtime (WebSockets)
+- **Files:** Supabase Storage (documentos, imágenes)
+
+### 🚀 Deploy Steps
+1. **Supabase**: Crear proyecto y ejecutar SQL setup
+2. **Netlify**: Conectar repo, configurar env vars
+3. **Testing**: Verificar funcionalidades en producción
+
+📋 **Guía completa**: [ENVIRONMENT_SETUP.md](ENVIRONMENT_SETUP.md)
 
 ## 🚀 Funcionalidades Avanzadas Implementadas
 
@@ -215,13 +233,29 @@ const { vitals, trackUserAction, trackSearch } = usePerformanceMonitoring();
 
 ## 📈 Métricas del Proyecto
 
-- **Lines of Code**: ~15,000+ líneas
-- **Custom Hooks**: 6 hooks avanzados
+- **Lines of Code**: ~12,000+ líneas (limpieza de duplicados)
+- **Custom Hooks**: 8 hooks avanzados
+- **Components**: 25+ componentes reutilizables
 - **Edge Functions**: 2 funciones serverless
-- **Database Tables**: 12 tablas con relaciones complejas
+- **Database Tables**: 8+ tablas con RLS
 - **Real-time Channels**: 4 canales de WebSocket
-- **Search Indexes**: 8 índices optimizados
 - **Performance Metrics**: 15+ métricas tracked
+- **Architecture**: 100% Serverless (Supabase + Netlify)
+
+## 🌟 Arquitectura Serverless
+
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Netlify       │    │    Supabase      │    │  Edge Functions │
+│   (Frontend)    │◄──►│  (Backend+DB)    │◄──►│  (Serverless)   │
+│                 │    │                  │    │                 │
+│ • React App     │    │ • PostgreSQL     │    │ • Approvals     │
+│ • Static Files  │    │ • Auth           │    │ • Email Send    │
+│ • CDN Global    │    │ • Storage        │    │ • Deno Runtime  │
+└─────────────────┘    │ • Realtime       │    └─────────────────┘
+                       │ • Row Level Sec  │
+                       └──────────────────┘
+```
 
 ---
 
